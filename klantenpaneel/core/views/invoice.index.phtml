@@ -1,0 +1,130 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+	<div class="main-content p-a-2">
+
+		<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+		?>
+
+		<h1><?php echo __('outstanding invoices'); ?></h1>
+
+		<?php
+		if(!empty($outstanding_invoices))
+		{
+			$this->showElement('invoice.outstanding');
+		}
+		else
+		{
+			echo __('you have no outstanding invoices');
+		}
+		?>
+
+		<div class="row">
+			<div class="col-md-6">
+				<h2 class="m-t-3"><?php echo __('billing data'); ?></h2>
+				<hr />
+
+					<?php
+					if($general_data_is_used === TRUE)
+					{
+						echo show_client_address($debtor) . '<br />';
+					}
+					else
+					{
+						echo (($debtor->InvoiceCompanyName) ? normalize($debtor->InvoiceCompanyName) : normalize($debtor->CompanyName)) . '<br />';
+						echo \Settings_Model::getGenderTranslation($debtor->InvoiceSex) . ' ' . (($debtor->InvoiceInitials) ? normalize($debtor->InvoiceInitials) : normalize($debtor->Initials)) . ' ' . (($debtor->InvoiceSurName) ? normalize($debtor->InvoiceSurName) : normalize($debtor->SurName)) . '<br />';
+						echo (($debtor->InvoiceAddress) ? normalize($debtor->InvoiceAddress) : normalize($debtor->Address)) . '<br />';
+						if(Settings_Model::get('IS_INTERNATIONAL') && (($debtor->InvoiceAddress2) ? $debtor->InvoiceAddress2 : $debtor->Address2))
+						{
+							echo (($debtor->InvoiceAddress2) ? normalize($debtor->InvoiceAddress2) : normalize($debtor->Address2)) . '<br />';
+						}
+						echo (($debtor->InvoiceZipCode) ? normalize($debtor->InvoiceZipCode) : normalize($debtor->ZipCode)) . ' ' . (($debtor->InvoiceCity) ? normalize($debtor->InvoiceCity) : normalize($debtor->City)) . '<br />';
+						if(Settings_Model::get('IS_INTERNATIONAL'))
+						{
+							if($debtor->InvoiceState)
+							{
+								if(isset(Settings_Model::$states[$debtor->InvoiceCountry]))
+								{
+									echo normalize(Settings_Model::$states[$debtor->InvoiceCountry][$debtor->InvoiceState]) . '<br />';
+								}
+								else
+								{
+									echo normalize($debtor->InvoiceState) . '<br />';
+								}
+							}
+							else
+							{
+								if(isset(Settings_Model::$states[$debtor->Country]))
+								{
+									echo normalize(Settings_Model::$states[$debtor->Country][$debtor->State]) . '<br />';
+								}
+								else
+								{
+									echo normalize($debtor->State) . '<br />';
+								}
+							}
+						}
+						echo normalize(Settings_Model::$countries[$debtor->InvoiceCountry]) . '<br />';
+
+						echo (($debtor->InvoiceEmailAddress) ? normalize(check_email_address($debtor->InvoiceEmailAddress, 'convert', ', ')) : normalize(check_email_address($debtor->EmailAddress, 'convert', ', '))) . '<br />';
+					}
+
+					if(in_array(Settings_Model::get('CLIENTAREA_DEBTOR_DATA_CHANGE'), array('yes', 'approve'), TRUE))
+					{
+						?>
+						<br />
+						<a href="<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('billingData', 'url'); ?>"><?php echo __('change billing data'); ?></a>
+						<?php
+					}
+					?>
+			</div>
+
+			<div class="col-md-6">
+				<h2 class="m-t-3"><?php echo __('payment data'); ?></h2>
+				<hr />
+				<?php
+				if($debtor->InvoiceAuthorisation == 'no')
+				{
+					echo __('payment data - bank transfer or online payments');
+					// If authorisation allowed, also add link
+					if(in_array(Settings_Model::get('CLIENTAREA_DEBTOR_PAYMENTDATA_CHANGE'), array('yes', 'approve'), TRUE) && Settings_Model::get('AUTHORISATION_AVAILABLE') === TRUE)
+					{
+						?>
+						<br/>
+						<br/>
+						<a href="<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('paymentData', 'url'); ?>"><?php echo __('payment data - activate authorisation'); ?></a>
+						<?php
+					}
+				}
+				else
+				{
+					echo sprintf(__('payment data - direct debit'), normalize($debtor->AccountNumber), normalize(($debtor->AccountName) ? $debtor->AccountName : (($debtor->CompanyName) ? $debtor->CompanyName : $debtor->Initials . ' '.$debtor->SurName)));
+
+					if(in_array(Settings_Model::get('CLIENTAREA_DEBTOR_PAYMENTDATA_CHANGE'), array('yes', 'approve'), TRUE))
+					{
+						?>
+						<br/>
+						<br/>
+						<a href="<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('paymentData', 'url'); ?>"><?php echo __('change payment data'); ?></a>
+						<?php
+					}
+				}
+				?>
+			</div>
+
+		</div>
+
+
+
+	</div>
+</div>
+
+

@@ -1,0 +1,19 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="list-group">
+	<?php
+	foreach($sub_menu as $_menu_item)
+	{
+		$active = ($_menu_item['url'] == __SITE_URL . '/' . rtrim($_GET['rt'], '/')) ? 'active' : '';
+		?>
+		<a href="<?php echo $_menu_item['url']; ?>" class="list-group-item list-group-item-action <?php echo $active; ?>">
+			<?php echo normalize($_menu_item['title']); ?>
+		</a>
+		<?php
+	}
+	?>
+</div>

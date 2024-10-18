@@ -1,0 +1,23 @@
+<div class="vps_new_packages">
+	<div class="package_container grid<?php echo PACKAGES_GRID; ?>">
+	
+		<?php
+		$div_counter = 0;
+		foreach($package_descriptions as $product_id => $description){ if(isset($list_products[$product_id]->ProductCode)){
+			$div_counter++;
+			?>
+			<div class="package_box <?php if($div_counter%PACKAGES_GRID === 0){ echo "last_col "; } ?><?php if(isset($vps['ProductCode']) && $vps['ProductCode'] == $list_products[$product_id]->ProductCode){ echo "active"; } ?>" style="word-break: break-all;">
+				<input name="VPS" type="radio" value="<?php echo $list_products[$product_id]->ProductCode; ?>" <?php if(isset($vps['ProductCode']) && $vps['ProductCode'] == $list_products[$product_id]->ProductCode){ echo "checked=\"checked\""; } ?>/> <strong><?php echo $list_products[$product_id]->ProductName; ?></strong><br />
+				<?php if($description){ echo $description; }else{ echo nl2br($list_products[$product_id]->ProductKeyPhrase); } ?>
+				
+				<?php echo show_amount_span($list_products[$product_id]);  ?>
+			</div>
+			<?php
+            if($div_counter%PACKAGES_GRID === 0 || count($package_descriptions) == $div_counter)
+            {
+                echo '<br clear="both" />';
+            }
+		}}
+		?>
+	</div>
+</div>

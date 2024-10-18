@@ -1,0 +1,39 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<table class="table m-t-lg table-striped">
+		<colgroup>
+			<col class="col-xs-3">
+			<col class="col-xs-9 col-lg-9 col-xl-5">
+			<col class="col-xs-4 hidden-lg-down">
+		</colgroup>
+		<thead>
+		<tr>
+			<th><?php echo __('ticket id'); ?></th>
+			<th><?php echo __('subject'); ?></th>
+			<th class="hidden-lg-down text-xs-right text-nowrap"><?php echo __('last reply'); ?></th>
+		</tr>
+		</thead>
+		<tbody>
+		<?php
+		foreach($open_tickets as $_ticket)
+		{
+			?>
+			<tr>
+				<td>
+					<a href="<?php echo __SITE_URL . '/' . __('ticket', 'url') . '/' . __('view', 'url') . '/' . $_ticket['Identifier']; ?>">
+						<?php echo normalize($_ticket['TicketID']); ?>
+					</a>
+				</td>
+				<td><?php echo normalize($_ticket['Subject']); ?></div></td>
+				<td class="hidden-lg-down text-xs-right"><?php echo rewrite_date_db2site($_ticket['LastDate']) . ' '.__('at').' '. rewrite_date_db2site($_ticket['LastDate'], 'H:i'); ?></td>
+			</tr>
+			<?php
+		}
+		?>
+
+		</tbody>
+	</table>

@@ -1,0 +1,84 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="sidebar-column p-t-1">
+
+	<?php
+	$search = Cache::get('filter-list-group-domain');
+	?>
+	<form class="m-b-2 form-list-search" role="search" action="<?php echo __SITE_URL . '/' . __('domain', 'url'); ?>">
+		<input type="text" class="form-control" placeholder="<?php echo __('search'); ?>" value="<?php if($search){ echo normalize($search); } ?>" id="list-search">
+	</form>
+
+	<?php
+	if(!empty($domains))
+	{
+		?>
+		<div id="list-items">
+
+			<h3 class="m-b-1 m-t-2">
+				<a class="hidden-lg-up" data-toggle="collapse" href="#list-group-domain" aria-controls="list-group-domain">
+					<?php echo __('domains'); ?>
+				</a>
+				<span class="hidden-md-down"><?php echo __('domains'); ?></span>
+				<span class="tag tag-default tag-pill pull-xs-right result-count"><?php echo ($domains) ? count($domains) : 0; ?></span>
+			</h3>
+
+			<div class="list-group full-width collapse collapse-md-up row scrollable-list" id="list-group-domain">
+				<?php
+				// Button for new domain...
+				if(Settings_Model::get('CLIENTAREA_DOMAIN_ORDERFORM') && Settings_Model::get('CLIENTAREA_DOMAIN_ORDERFORM') > 0)
+				{
+					// Normal link, which will open in client area
+					?>
+					<a href="<?php echo __SITE_URL . '/' . __('domain', 'url') . '/' . __('orderNew', 'url'); ?>" class="list-group-item list-group-item-action text-truncate text-xs-center hidden-sm-down<?php if(get_url_string() == 'domain.orderNew'){ echo ' active'; } ?>">
+						<span class="fas fa-plus"></span> <?php echo __('new domain'); ?>
+					</a>
+					<?php
+					// And a responsive link, which opens in new tab
+					?>
+					<a href="<?php echo Settings_Model::get('ORDERFORM_URL') . '?cart=' . Settings_Model::get('CLIENTAREA_DOMAIN_ORDERFORM'); ?>" class="list-group-item list-group-item-action text-truncate text-xs-center hidden-md-up" target="_blank">
+						<span class="fas fa-plus"></span> <?php echo __('new domain'); ?>
+					</a>
+					<?php
+				}
+
+				if(is_array($domains))
+				{
+					foreach($domains as $_item)
+					{
+						$active = (isset($service->id) && $_item['Identifier'] == $service->id) ? 'active' : '';
+						?>
+						<a href="<?php echo __SITE_URL . '/' . __('domain', 'url') . '/' . __('view', 'url') . '/' . $_item['Identifier']; ?>" class="list-group-item list-group-item-action <?php echo $active; ?>" data-search-term="<?php echo strtolower(normalize($_item['Domain'] . '.' . $_item['Tld'])); ?>">
+							<?php
+							if(isset($_item['Termination']) && $_item['Termination'])
+							{
+								?>
+								<s><?php echo normalize($_item['Domain'] . '.' . $_item['Tld']); ?></s>
+								<div class="clearfix">
+									<small class="text-muted"><?php echo sprintf(__('service list termination at'), rewrite_date_db2site($_item['Termination']['Date'])); ?></small>
+								</div>
+								<?php
+							}
+							else
+							{
+								echo normalize($_item['Domain'] . '.' . $_item['Tld']);
+							}
+							?>
+						</a>
+						<?php
+					}
+				}
+				?>
+				<a id="list-search-noresult" class="list-group-item hide"><?php echo __('no search results found'); ?></a>
+			</div>
+		</div>
+		<?php
+	}
+	?>
+
+
+</div>

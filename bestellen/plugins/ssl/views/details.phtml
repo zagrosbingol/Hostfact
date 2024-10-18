@@ -1,0 +1,366 @@
+<div class="o_form">
+
+	<br />
+
+	<?php
+	$this->set('progress_step','start');
+	$this->element('progress.phtml');
+	?>
+	
+	<?php
+	$this->element('errors.phtml');
+	?>
+	
+	<form name="OrderForm" method="post" action="?">
+	<input type="hidden" name="step" value="cart" />
+	<input type="hidden" name="cart" value="<?php echo ORDERFORM_ID; ?>" />
+	<input type="hidden" name="action" value="" />
+	
+
+	<h2><?php echo __('choose your ssl product', 'ssl'); ?> <?php if($orderform_settings->hasProductWizard == 'yes'){ ?><a href="?step=start&amp;cart=<?php echo ORDERFORM_ID; ?>" style="float:right;font-size:14px;font-weight:normal;"><?php echo __('to product wizard', 'ssl'); ?></a><?php } ?></h2>
+	<br />
+
+	<label class="w1"><?php echo __('ssl certificate', 'ssl'); ?></label>
+	<select name="SSL" class="w1">
+		<option value=""><?php echo __('please choose'); ?></option>
+		<?php
+		$chosen_product = false;
+		
+		if($orderform_settings->Groupable != 'no')
+		{
+			foreach($list_products_by_group as $tmp_group)
+			{
+				if(empty($tmp_group['products']))
+				{
+					continue;
+				}
+				?><optgroup label="<?php echo htmlspecialchars($tmp_group['title']); ?>"><?php
+				
+				foreach($tmp_group['products'] as $product_id => $tmp_product)
+				{
+					if(isset($ssl['ProductCode']) && $ssl['ProductCode'] == $tmp_product->ProductCode)
+					{
+						$chosen_product = $tmp_product;
+					}
+					
+					?><option value="<?php echo $tmp_product->ProductCode; ?>" <?php if(isset($ssl['ProductCode']) && $ssl['ProductCode'] == $tmp_product->ProductCode){ echo "selected=\"selected\""; } ?>><?php echo htmlspecialchars($tmp_product->ProductName); ?></option><?php
+				}
+				
+				?></optgroup><?php
+			}
+		}
+		else
+		{
+			foreach($list_products as $product_id => $tmp_product)
+			{
+				if(isset($ssl['ProductCode']) && $ssl['ProductCode'] == $tmp_product->ProductCode)
+				{
+					$chosen_product = $tmp_product;
+				}
+					
+				?><option value="<?php echo $tmp_product->ProductCode; ?>" <?php if(isset($ssl['ProductCode']) && $ssl['ProductCode'] == $tmp_product->ProductCode){ echo "selected=\"selected\""; } ?>><?php echo htmlspecialchars($tmp_product->ProductName); ?></option><?php
+			}
+		}
+		?>
+	</select>
+
+    <br /><br />
+
+	<div id="ssl_main_options" <?php if($sslinfo === false){ echo "style=\"display:none;\""; } ?>>
+
+		<label><?php echo __('ssl domain', 'ssl'); ?></label>
+		<span id="ssl_main_option_wildcard" <?php if($sslinfo === false || $sslinfo->Wildcard != 'yes'){ echo "style=\"display:none;\""; } ?>>*. </span><input type="text" name="CommonName" value="<?php if(isset($ssl['CommonName'])){ echo $ssl['CommonName']; } ?>"/>
+		<br />
+		
+		<div id="ssl_main_option_multidomain" <?php if($sslinfo === false || $sslinfo->MultiDomain != 'yes'){ echo "style=\"display:none;\""; } ?>>
+			<?php 
+			if(!empty($ssl['MultiDomainRecords']))
+			{
+				foreach($ssl['MultiDomainRecords'] as $multi_domain_record)
+				{
+					?><div class="ssl_main_multidomain_extra"><label>&nbsp;</label>
+					<input type="text" name="MultiDomain[]" value="<?php echo htmlspecialchars($multi_domain_record); ?>"/> <a class="ico-del" onclick="removeMultiDomain(this);"><img src="<?php echo ORDERFORM_URL; ?>images/delete.png" alt="X" /></a><br /></div><?php
+				}
+			}
+			?>	
+			<div>
+				<label>&nbsp;</label>
+				<a id="ssl_main_options_multidomain_extra_link" <?php if($sslinfo && ((isset($ssl['MultiDomainRecords']) && ($sslinfo->MultiDomainIncluded-1) <= count($ssl['MultiDomainRecords']))) || $sslinfo->MultiDomainIncluded <= 1){ echo "style=\"display:none;\""; } ?>><?php echo __('add extra domain', 'ssl'); ?></a>
+				<span id="ssl_main_options_multidomain_want_more" <?php if($sslinfo === false || $sslinfo->MultiDomainMax <= $sslinfo->MultiDomainIncluded || (!isset($ssl['MultiDomainRecords']) || ($sslinfo->MultiDomainIncluded-1) > count($ssl['MultiDomainRecords']))){ echo "style=\"display:none;\""; } ?>><?php echo __('add extra domain, included limit reached', 'ssl'); ?></span>
+			</div>
+						
+		</div>
+
+		<br />
+		
+		<div id="ssl_main_option_periods">
+			<label style="float:left;"><?php echo __('ssl period', 'ssl'); ?></label>
+			<div style="margin-left: 150px;">
+				<?php												
+				$available_periods = ($sslinfo && $sslinfo->Periods) ? explode(',', $sslinfo->Periods) : array('1');
+				$selected_period = (isset($ssl['Period']) && in_array($ssl['Period'], $available_periods)) ? $ssl['Period'] : current($available_periods);
+				foreach($available_periods as $av_period)
+				{ 
+					?><label class="no_width"><input name="Period" value="<?php echo $av_period; ?>" type="radio" <?php if($selected_period == $av_period){ echo "checked=\"checked\""; } ?>/> <?php echo $av_period.' '.__('year', 'ssl'); ?></label>
+					<?php
+					if(SHOW_SELECT_PRICE == 'yes')
+					{
+						if(isset($sslinfo->PeriodPrices['period']))
+						{
+							$tmp_price = (isset($sslinfo->PeriodPrices['period'][$av_period.'-j'])) ? $sslinfo->PeriodPrices['period'][$av_period.'-j'] : $sslinfo->PeriodPrices['period']['default'];
+							
+							?><span class="amount_span"><?php echo w_money((SHOW_VAT_INCLUDED) ? $tmp_price['PriceIncl'] : $tmp_price['PriceExcl']); ?> <?php echo w_period(1, 'j', 'per'); ?></span><?php
+						}
+						elseif($chosen_product)
+						{
+							?><span class="amount_span"><?php echo w_money((SHOW_VAT_INCLUDED) ? $chosen_product->PriceIncl : $chosen_product->PriceExcl); ?> <?php echo w_period(1, $chosen_product->PricePeriod, 'per'); ?></span><?php
+						} 
+					}
+					?>
+					<br />
+					<?php
+				}
+				?>				
+			</div>
+			<br />
+		</div>
+		
+		
+		<?php if($orderform_settings->askforCSR != 'no' || $orderform_settings->askforApproverMail != 'no'){ ?>
+		
+			<br />
+			
+			<h2><?php echo __('ssl properties', 'ssl'); ?></h2>
+			<br />
+			
+			<?php if($orderform_settings->askforCSR != 'no'){ ?>
+				<label style="float:left;"><?php echo __('csr', 'ssl'); ?></label>
+				<div style="margin-left: 150px;">
+					<?php if($orderform_settings->askforCSR == 'optional'){ ?>
+						<label class="no_width"><input name="hasCSR" value="yes" type="radio" <?php if(!isset($order['hasCSR']) || $order['hasCSR'] == 'yes'){ echo "checked=\"checked\""; } ?> /> <?php echo __('enter csr now', 'ssl'); ?></label><br />
+						<label class="no_width"><input name="hasCSR" value="no" type="radio"  <?php if(isset($order['hasCSR']) && $order['hasCSR'] == 'no'){ echo "checked=\"checked\""; } ?> /> <?php echo __('skip csr', 'ssl'); ?></label><br />
+						<br />
+					<?php } ?>
+					<textarea class="comment" name="CSR" <?php if($orderform_settings->askforCSR == 'optional' && (isset($order['hasCSR']) && $order['hasCSR'] == 'no')){ echo "style=\"display:none;\""; } ?>><?php if(isset($ssl['CSR'])){ echo $ssl['CSR']; } ?></textarea>
+				</div>
+				
+				<br /><br />
+			<?php } ?>
+			
+			<?php if($orderform_settings->askforApproverMail != 'no'){ ?>
+				<label><?php echo __('approver mail', 'ssl'); ?></label>
+				<input type="text" name="ApproverEmail" value="<?php if(isset($ssl['ApproverEmail'])){ echo $ssl['ApproverEmail']; } ?>"/>
+				<br /><br />
+			<?php } ?>
+		
+		<?php } ?>
+		
+	</div>
+	
+	
+	<?php
+	$this->element('options.phtml');
+	?>
+	
+	<div class="nav">
+		<p><a id="order_submit_btn"  class="button_submit"><?php echo __('button to customerdata'); ?></a></p>
+
+		<p class="footer_excl_incl_vat"><?php echo (SHOW_VAT_INCLUDED) ? __('footer prices are including tax') : ((count($array_taxpercentages) === 0 && count($array_total_taxpercentages) === 0) ? '&nbsp;' : __('footer prices are excluding tax')); ?></p>
+	</div>
+	
+
+	
+	</form>
+</div>
+
+<script type="text/javascript">
+var MultiDomainIncluded = <?php echo ($sslinfo && $sslinfo->MultiDomain == 'yes') ? intval($sslinfo->MultiDomainIncluded) : 1; ?>;
+var MultiDomainMax = <?php echo ($sslinfo && $sslinfo->MultiDomain == 'yes') ? intval($sslinfo->MultiDomainMax) : 1; ?>;
+jQuery(document).ready(function(){
+
+	jQuery('select[name="SSL"]').change(function(){
+		
+		if(jQuery(this).val() == '')
+		{
+			jQuery('#ssl_main_options').hide();
+		}
+		else
+		{
+			jQuery.post("?cart=<?php echo ORDERFORM_ID; ?>", { step: "get_ssl_info", ssl_product: jQuery(this).val()},function(data){
+				
+				if(data == null)
+				{
+					jQuery('#ssl_main_options').hide();
+					return false;
+				}
+				
+				// Show main options
+				jQuery('#ssl_main_options').show();
+				
+				// Wildcard
+				if(data.Wildcard == 'yes')
+				{
+					jQuery('#ssl_main_option_wildcard').show();
+				}
+				else
+				{
+					jQuery('#ssl_main_option_wildcard').hide();
+				}
+				
+				// Multi domain
+				if(data.MultiDomain == 'yes')
+				{
+					MultiDomainIncluded = data.MultiDomainIncluded;
+					MultiDomainMax = data.MultiDomainMax;
+					jQuery('#ssl_main_option_multidomain').show();
+					
+					// Check already entered domains
+					jQuery('#ssl_main_option_multidomain').find('.ssl_main_multidomain_extra').each(function(index,element){
+						if((2 + index) > MultiDomainIncluded)
+						{
+							jQuery(element).remove();
+						}
+					});
+					
+					// Show/hide link?
+					if((jQuery('#ssl_main_option_multidomain').find('.ssl_main_multidomain_extra').length + 1) < MultiDomainIncluded)
+					{
+						jQuery('#ssl_main_options_multidomain_extra_link').show();
+						jQuery('#ssl_main_options_multidomain_want_more').hide();
+					}
+					else if(MultiDomainIncluded == 1  || (jQuery('#ssl_main_option_multidomain').find('.ssl_main_multidomain_extra').length + 1) >= MultiDomainIncluded)
+					{
+						jQuery('#ssl_main_options_multidomain_extra_link').hide();
+			
+						if(MultiDomainIncluded < MultiDomainMax)
+						{
+							jQuery('#ssl_main_options_multidomain_want_more').show();
+						}
+					}
+				}
+				else
+				{
+					MultiDomainIncluded = 1;
+					MultiDomainMax = 1;
+					jQuery('#ssl_main_option_multidomain').hide();
+				}
+				
+				// Periods	
+				var SSLPeriods = data.Periods.split(',');		
+				if(jQuery(SSLPeriods).length == 1)
+				{										
+					// One period
+					jQuery('#ssl_main_option_periods div').html('<label class="no_width"><input name="Period" value="1" type="hidden" /> '+data.Periods+' <?php echo __('year', 'ssl'); ?></label>');
+					
+					// Show price
+					if(data.PeriodPrices == undefined && data.PriceLabel != undefined)
+					{
+						jQuery('#ssl_main_option_periods div').append('<span class="amount_span">'+data.PriceLabel+'</span>');
+					}
+					else if(data.PeriodPrices != undefined)
+					{
+						if(data.PeriodPrices.period[element+'-j'] != undefined)
+						{
+							jQuery('#ssl_main_option_periods div').append('<span class="amount_span">'+data.PeriodPrices.period[element+'-j']['PriceLabel']+'</span>');
+						}
+						else 
+						{
+							jQuery('#ssl_main_option_periods div').append('<span class="amount_span">'+data.PeriodPrices.period['default']['PriceLabel']+'</span>');
+						}
+					}
+					
+					jQuery('#ssl_main_option_periods div').append('<br />');																														
+				}
+				else
+				{
+					// Multiple					
+					var CurrentPeriod = jQuery('input[name="Period"]:checked').val();
+					
+					jQuery('#ssl_main_option_periods div').html('');
+					jQuery(SSLPeriods).each(function(index, element){
+						jQuery('#ssl_main_option_periods div').append('<label class="no_width"><input name="Period" value="'+element+'" type="radio" /> '+element+'  <?php echo __('year', 'ssl'); ?></label>');
+						
+						if(data.PeriodPrices == undefined && data.PriceLabel != undefined)
+						{
+							jQuery('#ssl_main_option_periods div').append('<span class="amount_span">'+data.PriceLabel+'</span>');
+						}
+						else if(data.PeriodPrices != undefined)
+						{
+							if(data.PeriodPrices.period[element+'-j'] != undefined)
+							{
+								jQuery('#ssl_main_option_periods div').append('<span class="amount_span">'+data.PeriodPrices.period[element+'-j']['PriceLabel']+'</span>');
+							}
+							else 
+							{
+								jQuery('#ssl_main_option_periods div').append('<span class="amount_span">'+data.PeriodPrices.period['default']['PriceLabel']+'</span>');
+							}
+						}
+						
+						jQuery('#ssl_main_option_periods div').append('<br />');
+					});
+					
+					// Select same period, or first one in the row
+					if(jQuery('input[name="Period"][value="'+CurrentPeriod+'"]').val() != CurrentPeriod)
+					{
+						jQuery('input[name="Period"]').first().prop('checked',true);
+					}
+					else
+					{
+						jQuery('input[name="Period"][value="'+CurrentPeriod+'"]').prop('checked',true);
+					}
+
+				}
+				
+				// WordPress iframe wrapper
+				postIframeHeight();
+				
+			},'json');
+		}
+
+	});
+	
+	jQuery('#ssl_main_options_multidomain_extra_link').click(function(){
+		
+		
+		jQuery('#ssl_main_options_multidomain_extra_link').parent().before('<div class="ssl_main_multidomain_extra"><label>&nbsp;</label>\n<input type="text" name="MultiDomain[]" value=""/> <a class="ico-del" onclick="removeMultiDomain(this);"><img src="<?php echo ORDERFORM_URL; ?>images/delete.png" alt="X" /></a><br /></div>');
+		
+		// Hide link?
+		if((jQuery('#ssl_main_option_multidomain').find('.ssl_main_multidomain_extra').length + 1) >= MultiDomainIncluded)
+		{
+			jQuery('#ssl_main_options_multidomain_extra_link').hide();
+
+			if(MultiDomainIncluded * 1 < MultiDomainMax * 1)
+			{
+				jQuery('#ssl_main_options_multidomain_want_more').show();
+			}
+		}
+		
+	});
+	
+	jQuery('input[name="hasCSR"]').click(function(){
+		if(jQuery('input[name="hasCSR"]:checked').val() == 'yes')
+		{
+			jQuery('textarea[name="CSR"]').show();
+		}
+		else
+		{
+			jQuery('textarea[name="CSR"]').hide();
+		}	
+	});
+	
+});
+
+function removeMultiDomain(element)
+{
+	// Remove line
+	element = jQuery(element).parent().remove();
+	
+	// Show link?
+	if((jQuery('#ssl_main_option_multidomain').find('.ssl_main_multidomain_extra').length + 1) < MultiDomainIncluded)
+	{
+		jQuery('#ssl_main_options_multidomain_extra_link').show();
+		jQuery('#ssl_main_options_multidomain_want_more').hide();
+	}
+
+}
+</script>

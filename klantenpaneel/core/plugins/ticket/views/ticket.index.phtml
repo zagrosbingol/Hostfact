@@ -1,0 +1,38 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+	<div class="main-content p-a-2">
+
+		<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+		?>
+
+		<h1><?php echo __('open tickets'); ?></h1>
+
+		<?php
+		if(!empty($open_tickets))
+		{
+			$this->showElement('ticket.open');
+		}
+		else
+		{
+			echo __('you have no open tickets');
+		}
+		?>
+
+		<h2 class="m-t-3"><?php echo __('create ticket'); ?></h2>
+		<hr />
+		<?php
+		// Load create ticket HTML
+		$this->showElement('ticket.create');
+		?>
+
+	</div>
+</div>

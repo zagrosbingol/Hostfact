@@ -1,0 +1,70 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="sidebar-column p-t-1">
+
+	<?php
+	// Get search input from cache
+	$search = Cache::get('filter-invoice-list');
+	$search_extended = Cache::get('search-invoice-list');
+	?>
+
+	<form class="m-b-1 form-list-search" role="search" action="<?php echo __SITE_URL . '/' . __('invoice', 'url'); ?>" data-searchtype="<?php echo ($search_extended) ? 'extended' : 'filter'; ?>">
+		<input type="text" class="form-control" placeholder="<?php echo __('search'); ?>" value="<?php echo ($search_extended) ? normalize($search_extended) : (($search) ? normalize($search) : ''); ?>" id="list-search">
+	</form>
+
+
+	<div id="list-search-container">
+
+		<div id="list-items">
+			<?php
+			// Only show when we have a list, or there is an extended search
+			if(!empty($invoice_list) || $search_extended)
+			{
+				?>
+				<div class="hide m-t-0 text-xs-right"><a href="#" data-event="extended-search"><?php echo ($search_extended) ? __('extended search search again') : __('extended search'); ?></a></div>
+
+				<h3 class="m-b-1 m-t-2">
+					<a class="hidden-lg-up" data-toggle="collapse" href="#invoice-list" aria-controls="invoice-list">
+						<?php echo ($search_extended) ? __('extended search results') : __('invoices'); ?>
+					</a>
+					<span class="hidden-md-down"><?php echo ($search_extended) ? __('extended search results') : __('invoices'); ?></span>
+					<span class="tag tag-default tag-pill pull-xs-right result-count"><?php echo ($invoice_list) ? count($invoice_list) : 0; ?></span>
+				</h3>
+
+				<div class="list-group full-width collapse collapse-md-up row scrollable-list" id="invoice-list">
+					<?php
+					foreach($invoice_list as $_item)
+					{
+						$active = (isset($invoice_object) && $_item['Identifier'] == $invoice_object->id) ? 'active' : '';
+						?>
+						<a href="<?php echo __SITE_URL . '/' . __('invoice', 'url') . '/' . __('view', 'url') . '/' . $_item['Identifier']; ?>" class="list-group-item list-group-item-action <?php echo $active; ?>" data-search-term="<?php echo strtolower(normalize($_item['InvoiceCode'])); ?>" id="item<?php echo $_item['Identifier']; ?>">
+							<?php echo normalize($_item['InvoiceCode']); ?>
+							<?php
+							if($_item['Authorisation'] == 'yes')
+							{
+								?>
+								<small class="text-muted"><?php echo __('direct debit invoice abbr'); ?></small><?php
+							}
+							?>
+
+							<span class="pull-xs-right"><?php echo money($_item['AmountIncl']); ?></span>
+							<div class="text-muted clearfix">
+								<small class="text-muted pull-xs-left"><?php echo rewrite_date_db2site($_item['Date']); ?></small>
+								<small class="text-muted pull-xs-right"><?php echo __($_item['Status'], 'array_invoicestatus'); ?></small>
+							</div>
+						</a>
+						<?php
+					}
+					?>
+					<a id="list-search-noresult" class="list-group-item<?php if(!empty($invoice_list)){ echo ' hide'; } ?>"><?php echo __('no search results found'); ?></a>
+				</div>
+				<?php
+			}
+			?>
+		</div>
+	</div>
+</div>

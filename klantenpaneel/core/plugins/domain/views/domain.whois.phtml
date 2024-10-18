@@ -1,0 +1,327 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2">
+
+	<?php
+	if (isset($message))
+	{
+		echo $message;
+		$this->unsetVar(array('message'));
+	}
+	?>
+
+	<h1><?php echo __('handle data') . ' ' . __('from') . ' ' . normalize($service->Domain . '.' . $service->Tld); ?></h1>
+
+	<?php
+		// if there is a pending modification, show a warning and a link to cancel it
+		$this->showElement('service.modification');
+	?>
+
+	<div class="row">
+
+		<div class="col-sm-12">
+
+			<form id="form-whois-data" class="m-t-2" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('domain', 'url'); ?>/<?php echo __('whois', 'url'); ?>/<?php echo $service->id; ?>">
+
+				<ul class="nav nav-tabs" id="handle-tabs" role="tablist">
+					<?php
+					$handle_types = array('owner', 'admin', 'tech');
+
+					$counter = 0;
+					foreach($handle_types as $_handle_type)
+					{
+						$handle = $service->HandleInfo[ucfirst($_handle_type) . 'Handle'];
+
+						// handle is debtor specific, debtor may change data
+						if($handle['Debtor'] > 0)
+						{
+							?>
+							<li class="nav-item">
+								<a class="nav-link <?php echo ($counter++ === 0) ? 'active' : ''; ?>" href="#<?php echo $_handle_type; ?>" data-toggle="tab" role="tab" aria-controls="<?php echo $_handle_type; ?>">
+									<?php echo __('handle ' . $_handle_type); ?>
+								</a>
+							</li>
+							<?php
+						}
+					}
+					?>
+				</ul>
+
+				<div class="tab-content">
+
+				<?php
+				$counter = 0;
+				foreach($handle_types as $_handle_type)
+				{
+					$handle = $service->HandleInfo[ucfirst($_handle_type) . 'Handle'];
+
+					// handle is debtor specific, debtor may change data
+					if($handle['Debtor'] > 0)
+					{
+						?>
+						<div class="tab-pane <?php echo ($counter++ === 0) ? 'active' : ''; ?>" id="<?php echo $_handle_type; ?>" role="tabpanel">
+							<h2><?php echo __('handle ' . $_handle_type); ?></h2>
+
+							<h2><?php echo __('company data'); ?></h2>
+							<div class="row">
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('companyname'); ?></label>
+									<input class="form-control CompanyName" type="text" name="<?php echo $_handle_type; ?>[CompanyName]" value="<?php echo normalize($handle['CompanyName']); ?>">
+								</div>
+
+								<div class="col-md-6 form-group companyname-toggle" <?php if(!$handle['CompanyName']) echo 'hidden'; ?>>
+									<label><?php echo __('legalform'); ?></label>
+
+									<select class="form-control" name="<?php echo $_handle_type; ?>[LegalForm]">
+										<?php
+										foreach(Settings_Model::$legaltypes as $key => $_legaltype)
+										{
+											?>
+											<option value="<?php echo $key ?>" <?php echo ($key == $handle['LegalForm']) ? 'selected="selected"' : '' ?>>
+												<?php echo normalize($_legaltype); ?>
+											</option>
+											<?php
+										}
+										?>
+									</select>
+								</div>
+
+								<div class="col-md-6 form-group companyname-toggle" <?php if(!$handle['CompanyName']) echo 'hidden'; ?>>
+									<label><?php echo __('companynumber'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[CompanyNumber]" value="<?php echo normalize($handle['CompanyNumber']); ?>">
+								</div>
+
+								<div class="col-md-6 form-group companyname-toggle" <?php if(!$handle['CompanyName']) echo 'hidden'; ?>>
+									<label><?php echo __('taxnumber'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[TaxNumber]" value="<?php echo normalize($handle['TaxNumber']); ?>">
+								</div>
+
+							</div>
+
+							<h2><?php echo __('personal data'); ?></h2>
+
+							<div class="row">
+
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('initials'); ?></label>
+									<br/>
+									<div class="row small-gutter">
+										<div class="col-md-4">
+											<select class="form-control" name="<?php echo $_handle_type; ?>[Sex]">
+												<?php
+												foreach(Settings_Model::$sexes as $key => $_sex)
+												{
+													?>
+													<option value="<?php echo $key ?>" <?php echo ($key == $handle['Sex']) ? 'selected="selected"' : '' ?>>
+														<?php echo normalize($_sex); ?>
+													</option>
+													<?php
+												}
+												?>
+											</select>
+										</div>
+										<div class="clearfix hidden-md-up small-margin-top"></div>
+										<div class="col-md-8">
+											<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[Initials]" value="<?php echo normalize($handle['Initials']); ?>">
+										</div>
+									</div>
+								</div>
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('surname'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[SurName]" value="<?php echo normalize($handle['SurName']); ?>">
+								</div>
+
+							</div>
+
+							<h2><?php echo __('address data'); ?></h2>
+
+							<div class="row">
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('address'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[Address]" value="<?php echo normalize($handle['Address']); ?>">
+									<?php
+										if(Settings_Model::get('IS_INTERNATIONAL'))
+										{
+											?>
+											<input class="form-control small-margin-top" type="text" name="<?php echo $_handle_type; ?>[Address2]" value="<?php echo normalize($handle['Address2']); ?>">
+											<?php
+										}
+									?>
+								</div>
+
+								<?php
+									if(Settings_Model::get('IS_INTERNATIONAL'))
+									{
+										?>
+										<div class="clearfix hidden-sm-down"></div>
+										<?php
+									}
+								?>
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('zipcode'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[ZipCode]" value="<?php echo normalize($handle['ZipCode']); ?>">
+								</div>
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('city'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[City]" value="<?php echo normalize($handle['City']); ?>">
+								</div>
+
+								<?php
+								if(Settings_Model::get('IS_INTERNATIONAL'))
+								{
+									?>
+									<div class="col-md-6 form-group">
+										<label><?php echo __('state'); ?></label>
+
+										<select class="form-control <?php if(!isset(Settings_Model::$states[$handle['Country']])){ echo "hide"; } ?>" name="<?php echo $_handle_type; ?>[StateCode]">
+											<?php
+											if(isset(Settings_Model::$states[$handle['Country']]))
+											{
+												foreach (Settings_Model::$states[$handle['Country']] as $key => $_state)
+												{
+													?>
+													<option value="<?php echo $key ?>" <?php echo ($key == $handle['State']) ? 'selected="selected"' : '' ?>>
+														<?php echo normalize($_state); ?>
+													</option>
+													<?php
+												}
+											}
+											?>
+										</select>
+										<input class="form-control <?php if(isset(Settings_Model::$states[$handle['Country']])){ echo "hide"; } ?>" type="text" name="<?php echo $_handle_type; ?>[State]" value="<?php echo normalize($handle['State']); ?>">
+									</div>
+									<?php
+								}
+								?>
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('country'); ?></label>
+									<br/>
+									<select class="form-control" name="<?php echo $_handle_type; ?>[Country]" data-handletype="<?php echo $_handle_type; ?>">
+										<?php
+										foreach(Settings_Model::$countries as $key => $_country)
+										{
+											$has_states = (isset(Settings_Model::$states[$key])) ? 'true' : 'false';
+											?>
+											<option value="<?php echo $key ?>" <?php echo ($key == $handle['Country']) ? 'selected="selected"' : '' ?> data-states="<?php echo $has_states; ?>">
+												<?php echo normalize($_country); ?>
+											</option>
+											<?php
+										}
+										?>
+									</select>
+								</div>
+
+							</div>
+
+							<h2><?php echo __('contact data'); ?></h2>
+
+							<div class="row">
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('emailaddress'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[EmailAddress]" value="<?php echo normalize(check_email_address($handle['EmailAddress'], 'convert', ', ')); ?>">
+								</div>
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('phonenumber'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[PhoneNumber]" value="<?php echo normalize($handle['PhoneNumber']); ?>">
+								</div>
+
+								<div class="col-md-6 form-group">
+									<label><?php echo __('faxnumber'); ?></label>
+									<input class="form-control" type="text" name="<?php echo $_handle_type; ?>[FaxNumber]" value="<?php echo normalize($handle['FaxNumber']); ?>">
+								</div>
+
+							</div>
+
+						</div>
+						<?php
+					}
+				}
+				?>
+				</div>
+
+				<div class="form-group row">
+					<div class="col-sm-12 m-t-1">
+						<a href="<?php echo __SITE_URL; ?>/<?php echo __('domain', 'url'); ?>/<?php echo __('view', 'url'); ?>/<?php echo $service->id; ?>" class="btn btn-secondary pull-xs-left">
+							<span class="fas fa-arrow-left"></span>&nbsp;
+							<?php echo __('back'); ?>
+						</a>
+						<button type="submit" class="btn btn-primary pull-xs-right"><?php echo __('save data'); ?></button>
+					</div>
+				</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
+	<script type="application/javascript">
+
+		$(function()
+		{
+			// toggle companyname fields, if the companyname is set or not
+			$('input.CompanyName').keyup( function()
+			{
+				if($(this).val() == '')
+				{
+					$(this).parents('.tab-pane').find('.companyname-toggle').prop('hidden', true);
+				}
+				else
+				{
+					$(this).parents('.tab-pane').find('.companyname-toggle').prop('hidden', false);
+				}
+			});
+
+			// support for states, switch the input/select (and fill the select with states) based on the chosen country
+			if($('input[name="owner[State]"').length > 0 || $('input[name="admin[State]"').length > 0 || $('input[name="tech[State]"').length > 0 )
+			{
+				$('form#form-whois-data').on('change', 'select[name="owner[Country]"], select[name="admin[Country]"], select[name="tech[Country]"]', function()
+				{
+					var handletype = $(this).data('handletype');
+
+					// no need to do a ajax call to get states if country has none
+					if($(this).children('option:selected').data('states') != undefined && $(this).children('option:selected').data('states') == false)
+					{
+						$('input[name="' + handletype + '[State]"]').val('').show();
+						$('select[name="' + handletype + '[StateCode]"]').html('').val('').hide();
+					}
+					else
+					{
+						$.post('<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('getStates', 'url'); ?>', { 'country' : $('select[name="' + handletype + '[Country]"]').val() }, function(data)
+						{
+							if(data != undefined && data.type != undefined && data.type == 'select')
+							{
+								$('input[name="' + handletype + '[State]"]').val('').hide();
+								$('select[name="' + handletype + '[StateCode]"]').html(data.options).show();
+								$('select[name="' + handletype + '[StateCode]"]').val('');
+							}
+							else
+							{
+								$('input[name="' + handletype + '[State]"]').val('').show();
+								$('select[name="' + handletype + '[StateCode]"]').html('').val('').hide();
+							}
+						}, 'json');
+					}
+				});
+			}
+
+		});
+
+	</script>
+
+</div>
+</div>

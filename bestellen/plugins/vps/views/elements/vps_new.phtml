@@ -1,0 +1,16 @@
+<?php 
+if(empty($list_products))
+{ 
+	?>
+	<div class="error_message">
+		<strong><?php echo __('error message'); ?></strong><br />
+		<?php echo __('no products in productgroup'); ?>
+	</div>
+	<br /><?php 
+}
+else
+{
+	$this->element('vps_new_'.$orderform_settings->Theme.'.phtml','vps');
+}
+?>
+<br />

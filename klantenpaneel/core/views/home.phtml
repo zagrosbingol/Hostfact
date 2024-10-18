@@ -1,0 +1,248 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+	<?php
+		if(isset($message))
+		{
+			?>
+			<div class="col-xs-12">
+				<?php echo $message; ?>
+			</div>
+			<?php
+		}
+	?>
+
+	<?php
+	/** SERVICE BUTTONS (ONLY IF THERE ARE MORE THAN 2 SERVICE TYPES) */
+	if(!empty($home_services) && count($home_services) > 2)
+	{
+		?>
+		<div class="col-xs-12">
+			<div class="row">
+			<?php
+				foreach($home_services as $_service)
+				{
+					?>
+					<div class="col-xs-6 col-md-3 col-lg-2 m-b-2 total-btn">
+						<a href="<?php echo $_service['url_services_page']; ?>" class="btn btn-secondary content-block p-t-1 p-b-1 text-xs-center">
+							<span class="fa-2x"><?php echo normalize($_service['amount']); ?></span><br />
+							<div><?php echo normalize(($_service['amount'] == 1) ? $_service['service_label'] : $_service['services_label']); ?></div>
+						</a>
+					</div>
+					<?php
+				}
+			?>
+			</div>
+		</div>
+		<div class="clearfix"></div>
+		<?php
+	}
+	?>
+
+	<?php /** SIDEBAR */ ?>
+
+	<div class="col-lg-4 pull-lg-right">
+
+		<div class="row">
+
+			<?php
+				/** SERVICE BUTTONS (ONLY IF THERE ARE LESS THAN 3 SERVICE TYPES) */
+				if(!empty($home_services) && count($home_services) <= 2)
+				{
+					foreach($home_services as $_service)
+					{
+						?>
+						<div class="col-xs-6 col-sm-4 col-lg-6 total-btn">
+							<a href="<?php echo $_service['url_services_page']; ?>" class="btn btn-secondary content-block p-t-1 p-b-1 text-xs-center">
+								<span class="fa-2x"><?php echo normalize($_service['amount']); ?></span><br />
+								<div><?php echo normalize(($_service['amount'] == 1) ? $_service['service_label'] : $_service['services_label']); ?></div>
+							</a>
+						</div>
+						<?php
+					}
+					?>
+					<div class="clearfix m-b-2"></div>
+					<?php
+				}
+			?>
+
+			<?php /** ORDER BUTTON */
+			if(!empty($services_orderforms))
+			{
+				?>
+				<div class="col-lg-12 m-b-2 home-order-button">
+					<div class="content-block p-a-1">
+						<span class="fas fa-shopping-cart fa-2x pull-left p-r-1 p-l-0"></span>
+						<a href="#" id="order-btn" class="font-medium pull-left small-margin-top">
+							<?php echo __('place new service order'); ?>
+						</a>
+						<div class="clearfix"></div>
+						<div id="order-service-type" class="hide p-l-3 font-medium">
+							<div class="m-t-1">
+								<?php echo __('what would you like to order'); ?>:
+							</div>
+							<ul class="p-l-1">
+								<?php
+								/** SERVICE ORDER LINKS */
+								foreach($services_orderforms as $_service_orderform)
+								{
+									?>
+									<li class="font-medium">
+										<?php /** BUTTON NON-MOBILE ONLY - opens orderform in iframe */ ?>
+										<a href="<?php echo normalize($_service_orderform['url_order_service']); ?>" class="hidden-sm-down">
+											<?php echo normalize($_service_orderform['service_label']); ?>
+										</a>
+										<?php /** BUTTON MOBILE ONLY - opens orderform in new page */ ?>
+										<a href="<?php echo normalize($_service_orderform['url_order_service_responsive']); ?>" class="hidden-md-up" target="_blank">
+											<?php echo normalize($_service_orderform['service_label']); ?>
+										</a>
+									</li>
+									<?php
+								}
+								?>
+							</ul>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+				<?php
+			}
+
+			/** DEBTOR DATA */ ?>
+
+			<div class="col-lg-12 m-b-2 hidden-md-down home-debtor-data">
+				<div class="content-block p-a-2 p-b-0">
+
+					<h1 class="font-large"><?php echo __('my data'); ?></h1>
+
+					<p>
+						<?php
+							echo ($account->CompanyName) ? normalize($account->CompanyName) . '<br />' : '';
+							echo trim(\Settings_Model::getGenderTranslation($account->Sex) . ' ');
+							echo normalize($account->Initials . ' ' . $account->SurName) . '<br />';
+							echo ($account->Address) ? normalize($account->Address) . '<br />' : '';
+							echo (Settings_Model::get('IS_INTERNATIONAL') && $account->Address2) ? normalize($account->Address2) . '<br />' : '';
+							echo ($account->ZipCode) ? normalize($account->ZipCode) . ' ' : '';
+							echo ($account->City) ? normalize($account->City) : '';
+							echo ($account->ZipCode || $account->City) ? '<br />' : '';
+							if(Settings_Model::get('IS_INTERNATIONAL') && $account->State)
+							{
+								echo (isset(Settings_Model::$states[$account->Country])) ? normalize(Settings_Model::$states[$account->Country][$account->State]) : normalize($account->State);
+								echo '<br />';
+							}
+							echo normalize(Settings_Model::$countries[$account->Country]);
+						?>
+					</p>
+					<p>
+						<?php
+							echo ($account->EmailAddress) ? '<span class="fas fa-envelope fa-fw" ></span>&nbsp; ' . normalize(check_email_address($account->EmailAddress, 'convert', ', ')) . '<br />' : '';
+							echo ($account->PhoneNumber) ? '<span class="fas fa-phone fa-fw" ></span>&nbsp; ' . normalize($account->PhoneNumber) . '<br />' : '';
+							echo ($account->MobileNumber) ? '<span class="fas fa-mobile-alt fa-fw" ></span>&nbsp; ' . normalize($account->MobileNumber) . '<br />' : '';
+							echo ($account->FaxNumber) ? '<span class="fas fa-fax fa-fw" ></span>&nbsp; ' . normalize($account->FaxNumber) . '<br />' : '';
+						?>
+					</p>
+					<br />
+					<a href="<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/'; ?>">
+						<?php echo __('change your data'); ?>
+					</a>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<?php /** MAIN CONTENT */ ?>
+
+	<div class="col-lg-8">
+		<div class="row">
+
+		<?php
+			/** WELCOME TEXT */
+			if(Settings_Model::get('CLIENTAREA_WELCOME_TITLE') || Settings_Model::get('CLIENTAREA_WELCOME_MESSAGE'))
+			{
+				?>
+				<div class="col-xl-12 m-b-2 welcome-text">
+					<div class="content-block p-a-2">
+
+						<?php
+						if(Settings_Model::get('CLIENTAREA_WELCOME_TITLE'))
+						{
+							?>
+							<h1><?php echo normalize((Settings_Model::get('CLIENTAREA_WELCOME_TITLE'))); ?></h1>
+							<?php
+						}
+
+						if(Settings_Model::get('CLIENTAREA_WELCOME_MESSAGE'))
+						{
+							echo xss_clean(Settings_Model::get('CLIENTAREA_WELCOME_MESSAGE'));
+						}
+						?>
+					</div>
+				</div>
+				<?php
+			}
+
+
+			/** OUTSTANDING INVOICES */
+			if(!empty($outstanding_invoices))
+			{
+				?>
+				<div class="col-xl-12 m-b-2">
+					<div class="content-block p-a-2">
+
+						<h1 class="font-large"><?php echo __('outstanding invoices'); ?></h1>
+
+						<?php
+							$this->showElement('invoice.outstanding');
+						?>
+
+					</div>
+				</div>
+				<?php
+			}
+
+			/** PRICEQUOTES TO BE ACCEPTED */
+			if(!empty($open_pricequotes))
+			{
+				?>
+
+				<div class="col-xl-12 m-b-2">
+					<div class="content-block p-a-2">
+
+						<h1 class="font-large"><?php echo __('pricequote to be accepted'); ?></h1>
+
+						<?php
+							$this->showElement('pricequote.open');
+						?>
+					</div>
+				</div>
+
+				<?php
+			}
+
+			/** ADDITONAL BLOCKS */
+			if(!empty($home_content))
+			{
+				foreach($home_content as $_home_content_block)
+				{
+					$this->showElement($_home_content_block['element'], (isset($_home_content_block['pluginName']) ? $_home_content_block['pluginName'] : false));
+				}
+			}
+		?>
+
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		$(function(){
+			$("#order-btn").click(function(e)
+			{
+				e.preventDefault();
+				$('#order-service-type').toggle();
+			});
+		});
+	</script>

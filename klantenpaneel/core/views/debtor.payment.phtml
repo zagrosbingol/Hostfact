@@ -1,0 +1,88 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-lg-9">
+
+	<div class="main-content p-a-2">
+
+		<?php if(isset($message)){ echo $message; } ?>
+
+		<h1><?php echo __('payment data'); ?></h1>
+
+		<?php
+		if(isset($modification_html) && $modification_html)
+		{
+			echo $modification_html;
+		}
+
+		if(isset($debtor->AccountNumber))
+		{
+			?>
+
+			<form id="form-payment-data" class="m-t-2" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('debtor', 'url'); ?>/<?php echo __('paymentData', 'url'); ?>">
+
+				<h2><?php echo __('bank details'); ?></h2>
+
+				<div class="row">
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('accountnumber'); ?></label>
+						<input class="form-control" type="text" name="AccountNumber"
+							   value="<?php echo normalize($debtor->AccountNumber); ?>">
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('accountname'); ?></label>
+						<input class="form-control" type="text" name="AccountName"
+							   value="<?php echo normalize($debtor->AccountName); ?>">
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('accountbank'); ?></label>
+						<input class="form-control" type="text" name="AccountBank"
+							   value="<?php echo normalize($debtor->AccountBank); ?>">
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('accountbic'); ?></label>
+						<input class="form-control" type="text" name="AccountBIC"
+							   value="<?php echo normalize($debtor->AccountBIC); ?>">
+					</div>
+				</div>
+
+				<?php
+				// AUTHORISATION_AVAILABLE means there is an active authorisation payment method, if there is none the user can still disable it
+				if(($debtor->InvoiceAuthorisation == 'yes' && Settings_Model::get('CLIENTAREA_DEBTOR_PAYMENTDATA_AUTHORISATION') == 'yes') || ($debtor->InvoiceAuthorisation == 'no' && Settings_Model::get('AUTHORISATION_AVAILABLE') === TRUE))
+				{
+					?>
+
+					<h2><?php echo __('direct debit'); ?></h2>
+
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" name="InvoiceAuthorisation" value="yes" <?php echo ($debtor->InvoiceAuthorisation == 'yes') ? 'checked' : ''; ?>> <?php echo __('pay with direct debit'); ?>
+						</label>
+					</div>
+					<?php
+				}
+				?>
+
+				<div class="form-group row m-t-2">
+					<div class="offset-sm-2 col-sm-10">
+						<button type="submit" class="btn btn-primary pull-xs-right"><?php echo __('save data'); ?></button>
+					</div>
+				</div>
+
+			</form>
+
+			<?php
+		}
+		?>
+
+	</div>
+</div>
+
+<?php validate_input($debtor->ErrorFields); ?>

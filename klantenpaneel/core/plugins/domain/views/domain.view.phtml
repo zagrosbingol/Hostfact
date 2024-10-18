@@ -1,0 +1,286 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2">
+
+	<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+
+		$this->showElement('service.terminate');
+	?>
+
+	<h1><?php echo __('domain') . ' ' . normalize($service->Domain . '.' . $service->Tld); ?></h1>
+
+	<?php
+		show_termination_warning($service);
+
+		if(!empty($service->ClientareaModifications))
+		{
+			// do not show the div if there is only one warning which we want to skip, else this will show a empty yellow bar
+			$hide_warning = (isset($_SESSION['SkipModificationWarning']) && count($service->ClientareaModifications) == 1 && isset($service->ClientareaModifications[$_SESSION['SkipModificationWarning']])) ? 'hide' : '';
+
+			echo '<div class="alert alert-warning ' . $hide_warning . '" role="alert">';
+			foreach($service->ClientareaModifications as $_modification_type => $_modification_data)
+			{
+				// skip the warning because we are already showing a success message
+				if(isset($_SESSION['SkipModificationWarning']) && $_SESSION['SkipModificationWarning'] == $_modification_type)
+				{
+					unset($_SESSION['SkipModificationWarning']);
+				}
+				else
+				{
+					switch($_modification_type)
+					{
+						case 'changenameserver':
+							$menu_url = __('nameservers', 'url');
+						break;
+						case 'editwhois':
+							$menu_url = __('whois', 'url');
+						break;
+						case 'editdnszone':
+							$menu_url = __('dnsmanagement', 'url');
+						break;
+					}
+
+					echo '<p>' . ((count($service->ClientareaModifications) > 1) ? '&bull; ' : '');
+
+
+                    if ($_modification_data['Status'] == 'error') {
+                        $_modification_warning = 'warning ' . $_modification_type . ' modification error';
+                    } else {
+                        $_modification_warning = 'warning ' . $_modification_type . ' modification awaiting approval';
+                    }
+
+                    echo sprintf(__($_modification_warning), rewrite_date_db2site($_modification_data['Modified']) . ' ' . __('at') . ' ' . rewrite_date_db2site($_modification_data['Modified'], 'H:i'));
+
+					echo ' <a href="' . __SITE_URL . '/' . __('domain', 'url') . '/' . $menu_url . '/' . $service->id . '">' . __('view modification') . '</a>';
+					echo '</p>';
+				}
+			}
+			echo '</div>';
+		}
+	?>
+
+	<div class="row m-t-1">
+
+		<div class="col-sm-12">
+
+			<?php
+			/** ACTION BUTTONS */
+
+			// only show buttons for active/cancelled domains
+			if($service->Status == 4 || $service->Status == 8)
+			{
+				if(in_array(Settings_Model::get('CLIENTAREA_DOMAIN_NAMESERVER_CHANGE'), array('yes', 'approve'), TRUE))
+				{
+					?>
+					<a class="btn btn-secondary action-btn m-r" href="<?php echo __SITE_URL . '/' . __('domain', 'url') . '/' . __('nameservers', 'url') . '/' . $service->id; ?>">
+						<span class="fas fa-globe fa-2x"></span>
+						<br/>
+						<div><?php echo __('change nameservers'); ?></div>
+					</a>
+					<?php
+				}
+
+				// if you cant change any handle (eg all general handles), dont show this button
+				if(in_array(Settings_Model::get('CLIENTAREA_DOMAIN_WHOIS_CHANGE'), array('yes', 'approve'), TRUE) && isset($service->HandleInfo)
+					&& ((isset($service->HandleInfo['OwnerHandle']) && $service->HandleInfo['OwnerHandle']['Debtor'] > 0)
+						|| (isset($service->HandleInfo['AdminHandle']) && $service->HandleInfo['AdminHandle']['Debtor'] > 0)
+						|| (isset($service->HandleInfo['TechHandle']) && $service->HandleInfo['TechHandle']['Debtor'] > 0))
+				)
+				{
+					?>
+					<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('domain', 'url') . '/' . __('whois', 'url') . '/' . $service->id; ?>">
+						<span class="fas fa-user fa-2x"></span>
+						<br/>
+						<div><?php echo __('change whois'); ?></div>
+					</a>
+					<?php
+				}
+			}
+
+			// Show token button also for cancelled domains
+			if($service->Status == 4 || $service->Status == 8)
+			{
+				// actions only possible for domains with a registrar integration
+				if(isset($service->RegistrarInfo['Class']) && $service->RegistrarInfo['Class'])
+				{
+					if($allowed_token === TRUE)
+					{
+						?>
+						<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('domain', 'url') . '/' . __('getToken', 'url') . '/' . $service->id; ?>" data-spinner="true">
+							<span class="fas fa-arrow-circle-right fa-2x"></span>
+							<br/>
+							<div><?php echo __('transfer domain'); ?></div>
+						</a>
+						<?php
+					}
+				}
+			}
+
+			// only show buttons for active/cancelled domains
+			if($service->Status == 4 || $service->Status == 8)
+			{
+				// show dns management button
+				if(in_array(Settings_Model::get('CLIENTAREA_DOMAIN_DNSZONE_CHANGE'), array('yes', 'approve'), TRUE) && isset($dnsmanagement) && $dnsmanagement === TRUE &&
+					isset($service->NameserversManager['Type']) &&
+					isset($service->NameserversManager['IntegrationID']))
+				{
+					?>
+					<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('domain', 'url') . '/' . __('dnsmanagement', 'url') . '/' . $service->id; ?>" data-spinner="true">
+						<span class="fas fa-globe fa-2x"></span><br />
+						<div><?php echo __('change dns records'); ?></div>
+					</a>
+					<?php
+				}
+			}
+			?>
+		</div>
+	</div>
+
+	<div class="row">
+
+		<div class="col-md-9 col-sm-12">
+
+			<h2><?php echo __('domain'); ?></h2>
+
+			<dl class="dl-horizontal">
+
+				<?php
+
+				if($service->EndDate && $service->EndDate != '0000-00-00')
+				{
+					?>
+					<dt class="col-sm-4"><?php echo ($service->DomainAutoRenew == 'on') ? __('renewal date') : __('expiration date'); ?></dt>
+					<dd class="col-sm-8"><?php echo rewrite_date_db2site($service->EndDate); ?></dd>
+					<?php
+				}
+
+				if($service->Status == 4)
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('registration date'); ?></dt>
+					<dd class="col-sm-8"><?php echo rewrite_date_db2site($service->RegistrationDate); ?></dd>
+					<?php
+				}
+
+				?>
+				<dt class="col-sm-4"><?php echo __('status'); ?></dt>
+				<dd class="col-sm-8"><?php echo __($service->Status, 'array_domainstatus'); ?></dd>
+			</dl>
+
+			<dl class="dl-horizontal">
+				<dt class="col-sm-4"><?php echo __('nameservers'); ?></dt>
+				<dd class="col-sm-8"><?php
+										if($service->DNS1){ echo $service->DNS1.'<br />'; }
+										if($service->DNS2){ echo $service->DNS2.'<br />'; }
+										if($service->DNS3){ echo $service->DNS3.'<br />'; }
+										?></dd>
+			</dl>
+
+			<dl class="dl-horizontal">
+				<?php
+				// Show handle info, but only when it's changeable (debtor-specific handle)
+				$handle_types = array('owner', 'admin', 'tech');
+
+				foreach($handle_types as $_handle_type)
+				{
+					$handle = $service->HandleInfo[ucfirst($_handle_type) . 'Handle'];
+					// handle is debtor specific, debtor may change data, so we will show this information on the view page
+					if($handle['Debtor'] > 0)
+					{
+						?>
+						<dt class="col-sm-4"><?php echo __('handle ' . $_handle_type); ?></dt>
+						<dd class="col-sm-8"><?php echo normalize(($handle['CompanyName']) ? $handle['CompanyName'] : $handle['Initials'] . ' ' . $handle['SurName']); ?></dd>
+						<?php
+					}
+				}
+				?>
+
+			</dl>
+		</div>
+
+	</div>
+
+	<?php
+		$this->showElement('service.subscription');
+	?>
+
+	<?php
+	if($service->HostingID > 0)
+	{
+		?>
+		<div class="row">
+
+			<div class="col-md-9">
+				<h2><?php echo __('hostingaccount'); ?></h2>
+
+				<div id="domain-info">
+					<span class="fas fa-spinner fa-lg fa-pulse"></span> &nbsp;
+					<?php echo __('retrieving data'); ?>
+				</div>
+
+				<dl class="dl-horizontal hide" id="domain-hosting">
+					<dt class="col-sm-4"><?php echo __('hostingaccount'); ?></dt>
+					<dd class="col-sm-8" id="hosting-username"></dd>
+
+					<dt class="col-sm-4"><?php echo __('hosting package'); ?></dt>
+					<dd class="col-sm-8" id="hosting-packagename"></dd>
+				</dl>
+			</div>
+
+		</div>
+		<?php
+	}
+	?>
+
+	<script type="text/javascript">
+		$(function()
+		{
+			<?php
+				if($service->HostingID > 0)
+				{
+					?>
+					// we retrieve the hosting account info with ajax
+					$.post('<?php echo __SITE_URL . '/' . __('domain', 'url') . '/' . __('getHosting', 'url') . '/' . $service->HostingID; ?>', { }, function(data)
+					{
+						$('#domain-info').html('');
+						if(data != undefined)
+						{
+							if(data.message != undefined)
+							{
+								$('#hosting-info').html(data.message)
+							}
+							else
+							{
+								if(data.hosting_url != undefined && data.hosting_id != undefined)
+								{
+									$('#hosting-username').html('<a href="' + data.hosting_url + data.hosting_id + '">' + normalize(data.Username) + '</a>');
+								}
+								else
+								{
+									$('#hosting-username').html(normalize(data.Username));
+								}
+
+								$('#hosting-packagename').html(normalize(data.PackageName));
+
+								$('#domain-hosting').show();
+							}
+						}
+					}, 'json');
+					<?php
+				}
+			?>
+		});
+
+	</script>
+
+</div>
+</div>

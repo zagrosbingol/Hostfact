@@ -1,0 +1,89 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Required meta tags always come first -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+	<title><?php echo (Settings_Model::get('CLIENTAREA_HEADER_TITLE')) ? normalize(Settings_Model::get('CLIENTAREA_HEADER_TITLE')) : normalize($company->CompanyName); ?></title>
+
+<?php // load all base css files, this calls an url which will get the css files and output their content ?>
+	<link rel="stylesheet" href="<?php echo __SITE_URL . '/asset/css'; ?>">
+<?php // this will autoload css files from the custom/assets/css folder ?>
+	<?php echo load_custom_assets('css'); ?>
+
+<?php // load all base js files, this calls an url which will get the js files and output their content ?>
+	<script src="<?php echo __SITE_URL . '/asset/js'; ?>"></script>
+<?php // this will autoload js files from the custom/assets/js folder ?>
+	<?php echo load_custom_assets('js'); ?>
+</head>
+
+<body>
+
+
+	<div style="text-align: center; margin-top: 40px;">
+		<h2>
+			<span class="fas fa-spinner fa-lg fa-pulse"></span> &nbsp;
+			<?php
+			echo __('you are being redirected to control panel');
+			?>
+		</h2>
+	</div>
+
+<?php
+	if(isset($service) && $service->id > 0 && $service->Server > 0 && in_array($service->Status, array(4, 5)))
+	{
+		?>
+		<form action="" method="POST" name="form" id="singlesignon_formpost">
+		</form>
+
+		<script type="text/javascript">
+			$(function()
+			{
+				$.post('<?php echo __SITE_URL . '/' . __('hosting', 'url') . '/' . __('singleSignOn', 'url') . '/' . $service->id; ?>', { },
+					function(data)
+					{
+						if(data == undefined)
+						{
+							// failed
+							window.location = '<?php echo __SITE_URL . '/' . __('hosting', 'url') . '/' . __('view', 'url') . '/' . $service->id; ?>';
+						}
+						else if(data.form_action != undefined)
+						{
+							// Form posts
+							$.each(data.data, function(input_name,input_value){
+								$('form#singlesignon_formpost').append('<input type="hidden" name="'+input_name+'" value="'+input_value+'" />');
+							});
+
+							$('form#singlesignon_formpost').attr('action', data.form_action);
+							$('form#singlesignon_formpost').submit();
+						}
+						else if(data.url != undefined && data.url != '')
+						{
+							window.location = data.url;
+						}
+						else
+						{
+							// failed
+							window.location = '<?php echo __SITE_URL . '/' . __('hosting', 'url') . '/' . __('view', 'url') . '/' . $service->id; ?>';
+						}
+					}, "json"
+				)
+				.fail(function() {
+					window.location = '<?php echo __SITE_URL . '/' . __('hosting', 'url') . '/' . __('view', 'url') . '/' . $service->id; ?>';
+				});
+			});
+		</script>
+		<?php
+	}
+?>
+
+</body>
+</html>

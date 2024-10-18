@@ -1,0 +1,93 @@
+<h2><?php echo __('auth payment completed'); ?></h2>
+
+<?php 
+if(isset($payment_object) && isset($payment_object->InvoiceCode))
+{ 
+	?><p><?php echo sprintf(__('we received the authorization for invoice'), $payment_object->InvoiceCode); ?></p><?php 
+}
+elseif(isset($payment_object) && isset($payment_object->OrderCode))
+{ 
+	?><p><?php echo sprintf(__('we received the authorization for order'), $payment_object->OrderCode); ?></p><?php 
+} 
+?>
+<br /><br />
+
+<strong><?php echo __('auth payment details'); ?></strong></p>
+
+<div class="box">
+		<table id="table_auth_payment" cellspacing="0" cellpadding="1" border="0">
+		<?php 
+		if(isset($payment_object) && isset($payment_object->InvoiceCode))
+		{ 
+			?>
+			<tr>
+				<td width="150"><?php echo __('invoice number'); ?>:</td>
+				<td><?php echo $payment_object->InvoiceCode; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('invoice date'); ?>:</td>
+				<td><?php echo $payment_object->Date; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('invoice amount'); ?>:</td>
+				<td><?php echo money($payment_object->AmountIncl); ?></td>
+			</tr>
+			<?php 
+			if(isset($_SESSION['payment']['mandate_id']) && $_SESSION['payment']['mandate_id'])
+			{
+				?>
+				<tr>
+					<td><?php echo __('direct debit mandate id'); ?>:</td>
+					<td><?php echo htmlspecialchars($_SESSION['payment']['mandate_id']); ?></td>
+				</tr>
+				<?php
+			}
+		}
+		elseif(isset($payment_object) && isset($payment_object->OrderCode))
+		{ 
+			?>	
+			<tr>
+				<td width="150"><?php echo __('order number'); ?>:</td>
+				<td><?php echo $payment_object->OrderCode; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('order date'); ?>:</td>
+				<td><?php echo $payment_object->Date; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('order amount'); ?>:</td>
+				<td><?php echo money($payment_object->AmountIncl); ?></td>
+			</tr>	
+			<?php 
+		} 
+		?>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		<?php if(isset($_SESSION['payment_auth']['AccountNumber']) && $_SESSION['payment_auth']['AccountNumber']){ ?>
+		<tr>
+			<td><?php echo __('auth accountnumber'); ?>:</td>
+			<td><?php echo htmlspecialchars($_SESSION['payment_auth']['AccountNumber']); ?></td>
+		</tr>
+		<?php } ?>
+		<?php if(isset($_SESSION['payment_auth']['AccountBIC']) && $_SESSION['payment_auth']['AccountBIC']){ ?>
+		<tr>
+			<td><?php echo __('auth accountbic'); ?>:</td>
+			<td><?php echo htmlspecialchars($_SESSION['payment_auth']['AccountBIC']); ?></td>
+		</tr>
+		<?php } ?>
+		<?php if(isset($_SESSION['payment_auth']['AccountName']) && $_SESSION['payment_auth']['AccountName']){ ?>
+		<tr>
+			<td><?php echo __('auth accountname'); ?>:</td>
+			<td><?php echo htmlspecialchars($_SESSION['payment_auth']['AccountName']); ?></td>
+		</tr>
+		<?php } ?>
+		<?php if(isset($_SESSION['payment_auth']['AccountCity']) && $_SESSION['payment_auth']['AccountCity']){ ?>
+		<tr>
+			<td><?php echo __('auth accountcity'); ?>:</td>
+			<td><?php echo htmlspecialchars($_SESSION['payment_auth']['AccountCity']); ?></td>
+		</tr>
+		<?php } ?>
+
+		</table>
+</div>

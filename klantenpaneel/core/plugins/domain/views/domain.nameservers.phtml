@@ -1,0 +1,141 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2">
+
+	<?php
+	if (isset($message))
+	{
+		echo $message;
+	}
+	?>
+
+	<h1><?php echo __('nameservers') . ' ' . __('from') . ' ' . normalize($service->Domain . '.' . $service->Tld); ?></h1>
+
+	<?php
+		// if there is a pending modification, show a warning and a link to cancel it
+		$this->showElement('service.modification');
+	?>
+
+	<div class="row">
+
+		<div class="col-sm-12">
+			<h2 class="m-t-0"><?php echo __('nameservers'); ?></h2>
+
+			<form id="form-domain-nameservers" class="m-t-2" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('domain', 'url'); ?>/<?php echo __('nameservers', 'url'); ?>/<?php echo $service->id; ?>">
+
+				<?php /** DNS 1 */ ?>
+				<div class="dns">
+					<div class="form-group row">
+						<label class="col-sm-3 form-control-label"><?php echo __('nameserver 1'); ?></label>
+						<div class="col-sm-6">
+							<input class="form-control dns" type="text" name="DNS1" value="<?php echo normalize($service->DNS1); ?>">
+						</div>
+					</div>
+
+					<?php
+						$full_domain = '.' . $service->Domain . '.' . $service->Tld;
+						// if the domain is present in the nameserver (glue record), show the IP field
+						$show_ip = ($service->DNS1 && strpos($service->DNS1, $full_domain) !== FALSE) ? '' : 'hide';
+					?>
+					<div class="form-group row dnsip <?php echo $show_ip; ?>">
+						<label class="col-sm-3 form-control-label"><?php echo __('nameserver 1 ip'); ?></label>
+						<div class="col-sm-6">
+							<input class="form-control" type="text" name="DNS1IP" value="<?php echo normalize($service->DNS1IP); ?>">
+						</div>
+					</div>
+				</div>
+
+				<?php /** DNS 2 */ ?>
+				<div class="dns">
+					<div class="form-group row">
+						<label class="col-sm-3 form-control-label"><?php echo __('nameserver 2'); ?></label>
+						<div class="col-sm-6">
+							<input class="form-control dns" type="text" name="DNS2" value="<?php echo normalize($service->DNS2); ?>">
+
+						</div>
+					</div>
+
+					<?php
+						$full_domain = $service->Domain . '.' . $service->Tld;
+						// if the domain is present in the nameserver (glue record), show the IP field
+						$show_ip = ($service->DNS2 && strpos($service->DNS2, $full_domain) !== FALSE) ? '' : 'hide';
+					?>
+					<div class="form-group row dnsip <?php echo $show_ip; ?>">
+						<label class="col-sm-3 form-control-label"><?php echo __('nameserver 2 ip'); ?></label>
+						<div class="col-sm-6">
+							<input class="form-control" type="text" name="DNS2IP" value="<?php echo normalize($service->DNS2IP); ?>">
+						</div>
+					</div>
+				</div>
+
+				<?php /** DNS 3 */ ?>
+				<div class="dns">
+					<div class="form-group row">
+						<label class="col-sm-3 form-control-label"><?php echo __('nameserver 3'); ?></label>
+						<div class="col-sm-6">
+							<input class="form-control dns" type="text" name="DNS3" value="<?php echo normalize($service->DNS3); ?>">
+						</div>
+					</div>
+
+					<?php
+						$full_domain = $service->Domain . '.' . $service->Tld;
+						// if the domain is present in the nameserver (glue record), show the IP field
+						$show_ip = ($service->DNS3 && strpos($service->DNS3, $full_domain) !== FALSE) ? '' : 'hide';
+					?>
+					<div class="form-group row dnsip <?php echo $show_ip; ?>">
+						<label class="col-sm-3 form-control-label"><?php echo __('nameserver 3 ip'); ?></label>
+						<div class="col-sm-6">
+							<input class="form-control form-control-sm" type="text" name="DNS3IP" value="<?php echo normalize($service->DNS3IP); ?>">
+						</div>
+					</div>
+				</div>
+
+				<?php /** BUTTONS */ ?>
+				<div class="form-group row">
+					<div class="col-sm-12 m-t-1">
+						<a href="<?php echo __SITE_URL; ?>/<?php echo __('domain', 'url'); ?>/<?php echo __('view', 'url'); ?>/<?php echo $service->id; ?>" class="btn btn-secondary pull-xs-left">
+							<span class="fas fa-arrow-left"></span>&nbsp;
+							<?php echo __('back'); ?>
+						</a>
+						<button type="submit" class="btn btn-primary pull-xs-right"><?php echo __('save data'); ?></button>
+					</div>
+				</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
+</div>
+</div>
+
+<?php validate_input($service->ErrorFields); ?>
+
+<script type="text/javascript">
+
+	$(function()
+	{
+		var full_domain = '<?php echo '.' . normalize($service->Domain . '.' . $service->Tld); ?>';
+
+		// show/hide DNS IPaddress when it is a glue record or not
+		$('#form-domain-nameservers').on('keyup change blur', 'input.dns', function()
+		{
+			var nameserver = $(this).val();
+			if(nameserver.indexOf(full_domain) != '-1')
+			{
+				$(this).parents('.dns').children('.dnsip').show();
+			}
+			else
+			{
+				$(this).parents('.dns').children('.dnsip').hide();
+			}
+		});
+	});
+
+</script>

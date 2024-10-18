@@ -1,0 +1,184 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+
+<div class="col-xl-9 col-lg-8 m-b-2">
+	<div class="main-content p-a-2">
+
+		<script src="<?php echo __SITE_URL . '/asset/js/jSignature.min.js'; ?>"></script>
+		<script src="<?php echo __SITE_URL . '/asset/js/accept.js'; ?>"></script>
+
+		<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+
+		$is_accepted = false;
+		if(in_array($pricequote_object->Status, array(3,4)))
+		{
+			$is_accepted = true;
+		}
+		?>
+
+				<a href="<?php echo $download_url; ?>" class="h1-small pull-xs-right hidden-xs-down"><?php echo __('see pricequote pdf'); ?></a>
+				<h1><?php echo ($is_accepted) ? __('pricequote is already accepted') :  __('accept pricequote online'); ?></h1>
+
+				<div class="hidden-sm-up">
+					<a href="<?php echo $download_url; ?>" class="h1-small"><?php echo __('see pricequote pdf'); ?></a><br />
+					<br />
+				</div>
+
+				<?php
+				if(!$is_accepted)
+				{
+					echo sprintf(__('accept the pricequote online'), normalize($pricequote_object->PriceQuoteCode));
+				}
+				?>
+
+				<form name="accept_pricequote" class="m-t-2" method="post" action="<?php echo $accept_url; ?>">
+
+					<?php
+					$disabled_input = '';
+					if($is_accepted)
+					{
+						$disabled_input = ' disabled="disabled"';
+					}
+					?>
+					<div class="form-group row">
+						<label class="col-xl-3 col-lg-4 form-control-label"><?php echo __('name'); ?></label>
+						<?php
+						if(isset($pricequote_object->AcceptName) && $pricequote_object->AcceptName)
+						{
+							$accept_name = $pricequote_object->AcceptName;
+						}
+						elseif($pricequote_object->CompanyName)
+						{
+							$accept_name = $pricequote_object->CompanyName;
+						}
+						else
+						{
+							$accept_name = trim($pricequote_object->Initials . ' ' . $pricequote_object->SurName);
+						}
+						?>
+						<div class="col-xl-9 col-lg-8">
+							<input class="form-control" type="text" name="name" value="<?php echo normalize($accept_name); ?>"<?php echo $disabled_input; ?>>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-xl-3 col-lg-4 form-control-label"><?php echo __('emailaddress'); ?></label>
+						<?php
+						if(isset($pricequote_object->AcceptEmail) && $pricequote_object->AcceptEmail)
+						{
+							$accept_email = $pricequote_object->AcceptEmail;
+						}
+						elseif($pricequote_object->EmailAddress)
+						{
+							$accept_email = check_email_address($pricequote_object->EmailAddress, 'convert', ', ');
+						}
+						else
+						{
+							$accept_email = '';
+						}
+						?>
+						<div class="col-xl-9 col-lg-8">
+							<input class="form-control" type="text" name="email" value="<?php echo normalize($accept_email); ?>"<?php echo $disabled_input; ?>>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-xl-3 col-lg-4 form-control-label"><?php echo __('comment'); ?><br />
+							<small class="text-muted pull-xs-left">(<?php echo __('not mandatory'); ?>)</small></label>
+						<div class="col-xl-9 col-lg-8">
+							<textarea name="comment" class="form-control autogrow" row="1"<?php echo $disabled_input; ?>><?php echo (isset($pricequote_object->AcceptComment) && $pricequote_object->AcceptComment) ? normalize($pricequote_object->AcceptComment) : ''; ?></textarea>
+						</div>
+					</div>
+
+					<?php
+					if(!$is_accepted)
+					{
+						?>
+						<div class="form-group row">
+							<label class="col-xl-3 col-lg-4 form-control-label"><?php echo __('signature'); ?></label>
+							<input type="hidden" name="signature" value="" />
+							<input type="hidden" name="signature_size" value="" />
+
+							<div class="col-xl-9 col-lg-8">
+								<div class="signature-container">
+									<div id="signature" class="signature-div"></div>
+									<div class="signature-placeholder">
+										<p><?php echo __('draw in this field'); ?></p>
+									</div>
+									<div class="signature-clear">
+										<a id="clear" href="#"><?php echo __('again'); ?></a>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<?php
+						if(Settings_Model::get('CLIENTAREA_TERMS_URL') != '' && Settings_Model::get('CLIENTAREA_PRICEQUOTE_ACCEPT_TERMS') == 'yes')
+						{
+							?>
+							<div class="form-group row">
+
+								<label class="col-xl-3 col-lg-4 form-control-label">&nbsp;</label>
+								<div class="col-xl-9 col-lg-8">
+									<label>
+										<input type="checkbox" name="terms" value="agree">
+										<?php echo sprintf(__('i agree with the terms and conditions'), '<a href="'.Settings_Model::get('CLIENTAREA_TERMS_URL').'" target="_blank">'.__('terms and conditions').'</a>'); ?>
+									</label>
+
+								</div>
+							</div>
+							<?php
+						}
+						?>
+
+						<div class="form-group row">
+							<div class="offset-sm-2 col-sm-10 m-t-1">
+								<button id="submit_accept_button" type="button" class="btn btn-primary pull-xs-right disabled"><?php echo __('accept'); ?></button>
+							</div>
+						</div>
+						<?php
+					}
+					else
+					{
+						?>
+
+						<div class="form-group row">
+							<label class="col-xl-3 col-lg-4 form-control-label"><?php echo __('signature'); ?></label>
+							<div class="col-xl-9 col-lg-8">
+								<div class="signature-container disabled">
+									<img src="data:image/svg+xml;base64,<?php echo normalize($pricequote_object->AcceptSignatureBase64); ?>" height="155"/>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group row">
+							<div class="col-md-9 col-sm-12">
+
+								<dl class="dl-horizontal">
+									<dt class="col-sm-4"><?php echo __('date and time'); ?></dt>
+									<dd class="col-sm-8"><?php echo rewrite_date_db2site($pricequote_object->AcceptDate) . ' ' . __('at') . ' ' . rewrite_date_db2site($pricequote_object->AcceptDate, 'H:i'); ?></dd>
+									<dt class="col-sm-4"><?php echo __('ip address'); ?></dt>
+									<dd class="col-sm-8"><?php echo (isset($pricequote_object->AcceptIPAddress) && $pricequote_object->AcceptIPAddress) ? normalize($pricequote_object->AcceptIPAddress) : ''; ?></dd>
+								</dl>
+
+							</div>
+						</div>
+						<?php
+					}
+					?>
+
+				</form>
+
+			</div>
+		</div>
+
+	</div>
+</div>

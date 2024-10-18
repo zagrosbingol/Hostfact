@@ -1,0 +1,23 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xs-12">
+<div class="main-content p-a-2">
+
+	<?php if(isset($message)){ echo $message; } ?>
+
+	<h1><?php echo __('mainmenu all services'); ?></h1>
+
+	<?php
+	foreach($services as $_service_type => $_service)
+	{
+		$this->showElement($_service['element'], (isset($_service['pluginName']) ? $_service['pluginName'] : false));
+		echo '<br />';
+	}
+	?>
+
+</div>
+</div>

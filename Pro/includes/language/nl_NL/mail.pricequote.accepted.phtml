@@ -1,0 +1,98 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Notificatie via het klantenpaneel</title>
+	<style type='text/css'>
+		<!--
+		body {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			color: #000000;
+		}
+		p {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			line-height: 1.8em;
+		}
+		a, a:visited, a:active {
+			text-decoration: underline;
+			color: #1b5cce;
+		}
+
+		a:hover {
+			text-decoration: none;
+			color: #1b5cce;
+		}
+		-->
+	</style>
+</head>
+<body>
+
+<br />
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<td width="100%" align="center">
+
+			<table border="0" cellpadding="0" cellspacing="0" width="680">
+				<tr>
+					<td width="680" align="left">
+
+						<h2>Offerte [pricequote-&gt;PriceQuoteCode] is geaccepteerd</h2>
+
+						<p style="line-height: 1.8em;">
+							Op <?php echo date('d-m-Y').' om '.date('H:i'); ?>  is de offerte <a href="<?php echo BACKOFFICE_URL ?>pricequotes.php?page=show&id=[pricequote-&gt;Identifier]">[pricequote-&gt;PriceQuoteCode]</a> ter waarde van [pricequote-&gt;AmountExcl] excl. BTW geaccepteerd.<br />
+							<br />
+							<strong>Klantgegevens [debtor-&gt;DebtorCode]:</strong><br />
+							<?php if($debtor->CompanyName != ''){ ?>[debtor-&gt;CompanyName]<br/><?php } ?>
+							[debtor-&gt;Initials] [debtor-&gt;SurName]<br/>
+							[debtor-&gt;Address]<br/>
+							[debtor-&gt;ZipCode] [debtor-&gt;City]<br/>
+							[debtor-&gt;CountryLong]<br/>
+							<br/>
+							<?php if($debtor->PhoneNumber != ''){ ?>T: [debtor-&gt;PhoneNumber]<br/><?php } ?>
+							<?php if($debtor->EmailAddress != ''){ ?>E: <a href="mailto:[debtor-&gt;EmailAddress]">[debtor-&gt;EmailAddress]</a><br /><?php } ?>
+
+							<?php if($pricequote->Reason){ ?>
+								<br />
+								<strong>Opmerking:</strong><br />
+								<?php echo nl2br($pricequote->Reason); ?>
+							<?php } ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<td width="680" align="left">
+
+						<br />
+
+						<h2>Hoe kan ik nu een factuur aanmaken?</h2>
+
+						<p style="line-height: 1.8em;">U kunt via HostFact eenvoudig via een druk op de knop een factuur aan laten maken. Dat kan nu direct, maar ook pas later.</p>
+
+						<p>
+							<a href="<?php echo BACKOFFICE_URL ?>pricequotes.php?page=show&id=[pricequote-&gt;Identifier]">Ga direct naar de offerte in HostFact</a>
+						</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td width="680" align="center">
+
+						<br /><br />
+
+						<font style="color:#666666;font-size:0.8em">Dit is een automatisch verzonden e-mail vanuit uw HostFact</font>
+
+					</td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+
+<br /><br />
+
+</body>
+</html>

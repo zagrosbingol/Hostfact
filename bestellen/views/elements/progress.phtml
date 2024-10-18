@@ -1,0 +1,10 @@
+<div class="progress">
+	<ol>
+		<li<?php if(isset($progress_step) && in_array($progress_step, array('start','customer','overview','completed'))){ echo " class=\"active\""; } ?>>&nbsp;</li>
+		<li<?php if(isset($progress_step) && in_array($progress_step, array('customer','overview','completed'))){ echo " class=\"active\""; } ?>>&nbsp;</li>
+		<li<?php if(isset($progress_step) && in_array($progress_step, array('overview','completed'))){ echo " class=\"active\""; } ?>>&nbsp;</li>
+		<li<?php if(isset($progress_step) && in_array($progress_step, array('completed'))){ echo " class=\"active\""; } ?>>&nbsp;</li>
+	</ol>
+</div>
+
+<br /><br />

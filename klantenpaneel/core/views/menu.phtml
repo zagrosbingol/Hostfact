@@ -1,0 +1,90 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="container-fluid bg-primary p-a-0 nav-container">
+<div class="container p-a-0">
+
+	<nav class="navbar navbar-dark">
+
+		<button class="navbar-toggler hidden-md-up bg-primary" type="button" data-toggle="collapse" data-target="#mainMenuNav">
+			&#9776;
+			<span class="p-l-1"><?php echo __('mainmenu menu'); ?></span>
+		</button>
+		<div class="collapse navbar-toggleable-sm" id="mainMenuNav">
+			<ul class="nav navbar-nav">
+				<?php
+				if(!empty($items_menu))
+				{
+					foreach($items_menu as $_menu_item_lvl1)
+					{
+						$lvl1_active = '';
+						if(isset($_menu_item_lvl1['active']))
+						{
+							// set active state for lvl 1, if currenturl or the first part of the current url is present in the active array
+							if(in_array($current_url, $_menu_item_lvl1['active']) || in_array($category_url, $_menu_item_lvl1['active']))
+							{
+								$lvl1_active = 'active';
+							}
+						}
+
+						if (!empty($_menu_item_lvl1['children']))
+						{
+							?>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle <?php echo $lvl1_active; ?>" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+									<?php echo normalize($_menu_item_lvl1['title']); ?>
+								</a>
+								<div class="dropdown-menu">
+									<?php
+									foreach($_menu_item_lvl1['children'] as $_menu_item_lvl2)
+									{
+										$lvl2_active = '';
+										// set active state for lvl 2, if currenturl or the first part of the current url is present in the active array
+										if(isset($_menu_item_lvl2['active']))
+										{
+											if(in_array($current_url, $_menu_item_lvl2['active']) || in_array($category_url, $_menu_item_lvl2['active']))
+											{
+												$lvl2_active = 'active';
+											}
+										}
+										?>
+										<a class="dropdown-item <?php echo $lvl2_active; ?>" href="<?php echo $_menu_item_lvl2['url']; ?>">
+											<?php echo normalize($_menu_item_lvl2['title']); ?>
+										</a>
+										<?php
+										// Should we add a divider to the bottom?
+										if(isset($_menu_item_lvl2['divider']) && $_menu_item_lvl2['divider'] == 'bottom')
+										{
+											?><div class="dropdown-divider hidden-xs-down"></div><?php
+										}
+									}
+									?>
+								</div>
+							</li>
+							<?php
+						}
+						elseif(isset($_menu_item_lvl1['url']) && isset($_menu_item_lvl1['title']))
+						{
+							?>
+							<li class="nav-item">
+								<a class="nav-link <?php echo $lvl1_active; ?>" href="<?php echo $_menu_item_lvl1['url']; ?>">
+									<?php echo normalize($_menu_item_lvl1['title']); ?>
+								</a>
+							</li>
+							<?php
+						}
+					}
+				}
+				?>
+			</ul>
+		</div>
+	</nav>
+
+</div>
+</div>
+
+<section class="container m-t-2 m-b-3">
+	<div class="row">

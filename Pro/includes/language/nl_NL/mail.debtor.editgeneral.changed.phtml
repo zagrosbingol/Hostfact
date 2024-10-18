@@ -1,0 +1,192 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Notificatie via het klantenpaneel</title>
+	<style type='text/css'>
+		<!--
+		body {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			color: #000000;
+		}
+		p {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			line-height: 1.8em;
+		}
+		a, a:visited, a:active {
+			text-decoration: underline;
+			color: #1b5cce;
+		}
+
+		a:hover {
+			text-decoration: none;
+			color: #1b5cce;
+		}
+		-->
+	</style>
+</head>
+<body>
+
+<br />
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<td width="100%" align="center">
+
+			<table border="0" cellpadding="0" cellspacing="0" width="680">
+				<tr>
+					<td width="680" align="left">
+
+						<h2>Gegevens van [debtor-&gt;DebtorCode] gewijzigd</h2>
+
+						<p style="line-height: 1.8em;">
+							Op <?php echo date('d-m-Y').' om '.date('H:i'); ?> heeft debiteur <a href="<?php echo BACKOFFICE_URL ?>debtors.php?page=edit&id=[debtor-&gt;Identifier]"><?php if($debtorOld->CompanyName != ''){ ?>[debtorOld-&gt;CompanyName]<?php }else{ ?>[debtorOld-&gt;Initials] [debtorOld-&gt;SurName]<?php } ?></a> persoonlijke gegevens gewijzigd via het klantenpaneel.
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<td width="680" align="center">
+						<br />
+						<hr />
+						<table border="0" cellpadding="5" cellspacing="0" width="100%">
+							<tr>
+								<td></td>
+								<td><strong>Huidige gegevens</strong></td>
+								<td><strong>Gewijzigde gegevens</strong></td>
+							</tr>
+							<?php if($debtorOld->CompanyName != '' || $debtorChanged->CompanyName != ''){ ?>
+								<tr>
+									<td>Bedrijfsnaam</td>
+									<td><?php echo $debtorOld->CompanyName; ?></td>
+									<td><?php if($debtorChanged->CompanyName != $debtorOld->CompanyName){ echo ($debtorChanged->CompanyName) ? $debtorChanged->CompanyName : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>KvK-nummer</td>
+									<td><?php echo $debtorOld->CompanyNumber; ?></td>
+									<td><?php if($debtorChanged->CompanyNumber != $debtorOld->CompanyNumber){ echo ($debtorChanged->CompanyNumber) ? $debtorChanged->CompanyNumber : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>BTW-nummer</td>
+									<td><?php echo $debtorOld->TaxNumber; ?></td>
+									<td><?php if($debtorChanged->TaxNumber != $debtorOld->TaxNumber){ echo ($debtorChanged->TaxNumber) ? $debtorChanged->TaxNumber : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>Rechtsvorm</td>
+									<td><?php echo $debtorOld->LegalForm; ?></td>
+									<td><?php if($debtorChanged->LegalForm != $debtorOld->LegalForm){ echo ($debtorChanged->LegalForm) ? $debtorChanged->LegalForm : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td colspan="3">&nbsp;</td>
+								</tr>
+							<?php } ?>
+							<tr>
+								<td>Contactpersoon</td>
+								<td><?php echo settings::getGenderTranslation($debtorOld->Sex).' '.$debtorOld->Initials.' '.$debtorOld->SurName; ?></td>
+								<td><?php if($debtorChanged->Sex != $debtorOld->Sex || $debtorChanged->Initials != $debtorOld->Initials || $debtorOld->SurName != $debtorChanged->SurName){ echo ($debtorChanged->Sex || $debtorChanged->Initials || $debtorChanged->SurName) ? settings::getGenderTranslation($debtorChanged->Sex).' '.$debtorChanged->Initials.' '.$debtorChanged->SurName : '-'; } ?></td>
+							</tr>
+							<tr>
+								<td>Adres</td>
+								<td><?php echo $debtorOld->Address; if($debtorOld->Address2){ echo '<br />'.$debtorOld->Address2; } ?></td>
+								<td><?php if($debtorChanged->Address != $debtorOld->Address || $debtorChanged->Address2 != $debtorOld->Address2){ echo ($debtorChanged->Address) ? $debtorChanged->Address : '-'; if($debtorChanged->Address2){ echo '<br />'.$debtorChanged->Address2; } } ?></td>
+							</tr>
+							<tr>
+								<td>Postcode en plaats</td>
+								<td><?php echo $debtorOld->ZipCode.' '.$debtorOld->City; ?></td>
+								<td><?php if($debtorChanged->ZipCode != $debtorOld->ZipCode || $debtorOld->City != $debtorChanged->City){ echo ($debtorChanged->ZipCode || $debtorChanged->City) ? $debtorChanged->ZipCode.' '.$debtorChanged->City : '-'; } ?></td>
+							</tr>
+							<?php if(IS_INTERNATIONAL){ ?>
+								<tr>
+									<td>Staat</td>
+									<td><?php echo $debtorOld->StateName; ?></td>
+									<td><?php if($debtorChanged->StateName != $debtorOld->StateName){ echo ($debtorChanged->StateName) ? $debtorChanged->StateName : '-'; } ?></td>
+								</tr>
+							<?php } ?>
+							<tr>
+								<td>Land</td>
+								<td><?php echo $debtorOld->CountryLong; ?></td>
+								<td><?php if($debtorChanged->CountryLong != $debtorOld->CountryLong){ echo ($debtorChanged->CountryLong) ? $debtorChanged->CountryLong : '-'; } ?></td>
+							</tr>
+
+							<tr>
+								<td>E-mailadres</td>
+								<td><?php echo $debtorOld->EmailAddress; ?></td>
+								<td><?php if($debtorChanged->EmailAddress != $debtorOld->EmailAddress){ echo ($debtorChanged->EmailAddress) ? $debtorChanged->EmailAddress : '-'; } ?></td>
+							</tr>
+							<?php if($debtorChanged->SecondEmailAddress || $debtorOld->SecondEmailAddress){ ?>
+								<tr>
+									<td>Extra e-mailadres</td>
+									<td><?php echo $debtorOld->SecondEmailAddress; ?></td>
+									<td><?php if($debtorChanged->SecondEmailAddress != $debtorOld->SecondEmailAddress){ echo ($debtorChanged->SecondEmailAddress) ? $debtorChanged->SecondEmailAddress : '-'; } ?></td>
+								</tr>
+							<?php } ?>
+							<tr>
+								<td>Telefoonnummer</td>
+								<td><?php echo $debtorOld->PhoneNumber; ?></td>
+								<td><?php if($debtorChanged->PhoneNumber != $debtorOld->PhoneNumber){ echo ($debtorChanged->PhoneNumber) ? $debtorChanged->PhoneNumber : '-'; } ?></td>
+							</tr>
+							<?php if($debtorChanged->FaxNumber || $debtorOld->FaxNumber){ ?>
+								<tr>
+									<td>Faxnummer</td>
+									<td><?php echo $debtorOld->FaxNumber; ?></td>
+									<td><?php if($debtorChanged->FaxNumber != $debtorOld->FaxNumber){ echo ($debtorChanged->FaxNumber) ? $debtorChanged->FaxNumber : '-'; } ?></td>
+								</tr>
+							<?php } ?>
+							<?php if($debtorChanged->MobileNumber || $debtorOld->MobileNumber){ ?>
+								<tr>
+									<td>Mobiel nummer</td>
+									<td><?php echo $debtorOld->MobileNumber; ?></td>
+									<td><?php if($debtorChanged->MobileNumber != $debtorOld->MobileNumber){ echo ($debtorChanged->MobileNumber) ? $debtorChanged->MobileNumber : '-'; } ?></td>
+								</tr>
+							<?php } ?>
+							<tr>
+								<td>Mailing ontvangen</td>
+								<td><?php global $array_mailingoptin; echo $array_mailingoptin[$debtorOld->Mailing]; ?></td>
+								<td><?php if($debtorChanged->Mailing != $debtorOld->Mailing){ echo ($debtorChanged->Mailing) ? $array_mailingoptin[$debtorChanged->Mailing] : '-'; } ?></td>
+							</tr>
+
+						</table>
+
+						<hr />
+					</td>
+
+				</tr>
+				<tr>
+					<td width="680" align="left">
+
+						<br />
+
+						<h2>Wat moet ik doen om de wijziging te verwerken?</h2>
+						<?php if($debtorChanged->ClientareaProfileObject->Rights['CLIENTAREA_DEBTOR_DATA_CHANGE'] == 'approve'){ ?>
+							<p style="line-height: 1.8em;">U kunt via HostFact het verzoek tot wijziging goedkeuren, aanpassen of weigeren. Door op onderstaande link te klikken, komt u direct op de pagina van de debiteur uit.</p>
+						<?php }else{ ?>
+							<p style="line-height: 1.8em;">U hoeft geen actie te ondernemen, omdat u heeft ingesteld dat wijzigingen van persoonlijke gegevens zijn toegestaan. De wijziging is daarom al doorgevoerd en deze e-mail geldt enkel ter notificatie.</p>
+						<?php } ?>
+						<hr />
+
+						<p>
+							<a href="<?php echo BACKOFFICE_URL ?>debtors.php?page=edit&id=[debtor-&gt;Identifier]">Ga direct naar de debiteur in HostFact</a>
+						</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td width="680" align="center">
+
+						<br /><br />
+
+						<font style="color:#666666;font-size:0.8em">Dit is een automatisch verzonden e-mail vanuit uw HostFact</font>
+
+					</td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+
+<br /><br />
+
+</body>
+</html>

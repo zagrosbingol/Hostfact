@@ -1,0 +1,290 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-lg-9">
+
+		<div class="main-content p-a-2">
+
+			<?php if(isset($message)){ echo $message; } ?>
+
+			<h1><?php echo __('general data'); ?></h1>
+
+			<?php
+			if(isset($modification_html) && $modification_html)
+			{
+				echo $modification_html;
+			}
+
+			if(isset($debtor->SurName))
+			{
+			?>
+
+			<form class="m-t-2" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('debtor', 'url'); ?>" id="debtor-view">
+
+				<h2><?php echo __('company data'); ?></h2>
+				<div class="row">
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('companyname'); ?></label>
+						<input class="form-control" type="text" name="CompanyName" value="<?php echo normalize($debtor->CompanyName); ?>">
+					</div>
+
+					<div class="col-md-6 form-group companyname-toggle" <?php if(!$debtor->CompanyName) echo 'hidden'; ?>>
+						<label><?php echo __('legalform'); ?></label>
+
+						<select class="form-control" name="LegalForm">
+							<?php
+							foreach(Settings_Model::$legaltypes as $key => $_legaltype)
+							{
+								?>
+								<option value="<?php echo $key ?>" <?php echo ($key == $debtor->LegalForm) ? 'selected="selected"' : '' ?>>
+									<?php echo normalize($_legaltype) ?>
+								</option>
+								<?php
+							}
+							?>
+						</select>
+					</div>
+
+					<div class="col-md-6 form-group companyname-toggle" <?php if(!$debtor->CompanyName) echo 'hidden'; ?>>
+						<label><?php echo __('companynumber'); ?></label>
+						<input class="form-control" type="text" name="CompanyNumber" value="<?php echo normalize($debtor->CompanyNumber); ?>">
+					</div>
+
+					<div class="col-md-6 form-group companyname-toggle" <?php if(!$debtor->CompanyName) echo 'hidden'; ?>>
+						<label><?php echo __('taxnumber'); ?></label>
+						<input class="form-control" type="text" name="TaxNumber" value="<?php echo normalize($debtor->TaxNumber); ?>">
+					</div>
+
+				</div>
+
+				<h2><?php echo __('personal data'); ?></h2>
+
+				<div class="row">
+
+					<div class="col-md-6 form-group">
+
+						<label><?php echo __('initials'); ?></label>
+						<br/>
+						<div class="row small-gutter">
+							<div class="col-md-4">
+								<select class="form-control" name="Sex">
+									<?php
+									foreach(Settings_Model::$sexes as $key => $_sex)
+									{
+										?>
+										<option value="<?php echo $key ?>" <?php echo ($key == $debtor->Sex) ? 'selected="selected"' : '' ?>>
+											<?php echo normalize($_sex); ?>
+										</option>
+										<?php
+									}
+									?>
+								</select>
+							</div>
+							<div class="clearfix hidden-md-up small-margin-top"></div>
+							<div class="col-md-8">
+								<input class="form-control" type="text" name="Initials" value="<?php echo normalize($debtor->Initials); ?>">
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('surname'); ?></label>
+						<input class="form-control" type="text" name="SurName" value="<?php echo normalize($debtor->SurName); ?>">
+					</div>
+				</div>
+
+				<h2><?php echo __('address data'); ?></h2>
+
+				<div class="row">
+
+					<div class="col-md-6 form-group">
+						<div class="">
+							<label><?php echo __('address'); ?></label>
+							<input class="form-control" type="text" name="Address" value="<?php echo normalize($debtor->Address); ?>">
+							<?php
+								if(Settings_Model::get('IS_INTERNATIONAL'))
+								{
+									?>
+									<input class="form-control small-margin-top" type="text" name="Address2" value="<?php echo normalize($debtor->Address2); ?>" maxlength="100">
+									<?php
+								}
+							?>
+						</div>
+					</div>
+
+					<?php
+						if(Settings_Model::get('IS_INTERNATIONAL'))
+						{
+							?>
+							<div class="clearfix hidden-sm-down"></div>
+							<?php
+						}
+					?>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('zipcode'); ?></label>
+						<input class="form-control" type="text" name="ZipCode" value="<?php echo normalize($debtor->ZipCode); ?>">
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('city'); ?></label>
+						<input class="form-control" type="text" name="City" value="<?php echo normalize($debtor->City); ?>">
+					</div>
+
+					<?php
+					if(Settings_Model::get('IS_INTERNATIONAL'))
+					{
+						?>
+						<div class="col-md-6 form-group">
+							<label><?php echo __('state'); ?></label>
+
+							<select class="form-control <?php if(!isset(Settings_Model::$states[$debtor->Country])){ echo "hide"; } ?>" name="StateCode">
+								<?php
+								if(isset(Settings_Model::$states[$debtor->Country]))
+								{
+									foreach (Settings_Model::$states[$debtor->Country] as $key => $_state)
+									{
+										?>
+										<option value="<?php echo $key ?>" <?php echo ($key == $debtor->State) ? 'selected="selected"' : '' ?>>
+											<?php echo normalize($_state) ?>
+										</option>
+										<?php
+									}
+								}
+								?>
+							</select>
+							<input class="form-control <?php if(isset(Settings_Model::$states[$debtor->Country])){ echo "hide"; } ?>" type="text" name="State" value="<?php echo normalize($debtor->State); ?>">
+						</div>
+						<?php
+					}
+					?>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('country'); ?></label><br />
+						<select class="form-control" name="Country">
+							<?php
+							foreach(Settings_Model::$countries as $key => $_country)
+							{
+								$has_states = (isset(Settings_Model::$states[$key])) ? 'true' : 'false';
+								?>
+								<option value="<?php echo $key ?>" <?php echo ($key == $debtor->Country) ? 'selected="selected"' : '' ?> data-states="<?php echo $has_states; ?>">
+									<?php echo normalize($_country); ?>
+								</option>
+								<?php
+							}
+							?>
+						</select>
+					</div>
+
+				</div>
+
+				<h2><?php echo __('contact data'); ?></h2>
+
+				<div class="row">
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('emailaddress'); ?></label>
+						<input class="form-control" type="text" name="EmailAddress" value="<?php echo normalize(check_email_address($debtor->EmailAddress, 'convert', ', ')); ?>">
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('phonenumber'); ?></label>
+						<input class="form-control" type="text" name="PhoneNumber" value="<?php echo normalize($debtor->PhoneNumber); ?>">
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('mobilenumber'); ?></label>
+						<input class="form-control" type="text" name="MobileNumber" value="<?php echo normalize($debtor->MobileNumber); ?>">
+					</div>
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('faxnumber'); ?></label>
+						<input class="form-control" type="text" name="FaxNumber" value="<?php echo normalize($debtor->FaxNumber); ?>">
+					</div>
+
+				</div>
+
+				<h2><?php echo __('debtor preferences'); ?></h2>
+
+				<div class="row">
+
+					<div class="col-md-6 form-group">
+						<label><?php echo __('debtor mailings'); ?></label>
+						<select class="form-control" name="Mailing">
+							<option value="yes" <?php echo ($debtor->Mailing == 'yes') ? 'selected="selected"' : '' ?>><?php echo __('yes', 'array_mailingopt'); ?></option>
+							<option value="no" <?php echo ($debtor->Mailing == 'no') ? 'selected="selected"' : '' ?>><?php echo __('no', 'array_mailingopt'); ?></option>
+						</select>
+					</div>
+
+				</div>
+
+				<div class="form-group row">
+					<div class="offset-sm-2 col-sm-10">
+						<button type="submit" class="btn btn-primary pull-xs-right"><?php echo __('save data'); ?></button>
+					</div>
+				</div>
+
+			</form>
+			<?php
+			}
+			?>
+
+		</div>
+	</div>
+
+<?php validate_input($debtor->ErrorFields); ?>
+
+<script type="application/javascript">
+
+	$(function()
+	{
+		// toggle companyname fields, if the companyname is set or not
+		$('input[name="CompanyName"]').keyup( function()
+		{
+			if($(this).val() == '')
+			{
+				$('div.companyname-toggle').prop('hidden', true);
+			}
+			else
+			{
+				$('div.companyname-toggle').prop('hidden', false);
+			}
+		});
+
+		// support for states, switch the input/select (and fill the select with states) based on the chosen country
+		if($('input[name="State"').length > 0)
+		{
+			$('form#debtor-view').on('change', 'select[name="Country"]', function()
+			{
+				// no need to do a ajax call to get states if country has none
+				if($('select[name="Country"] option:selected').data('states') != undefined && $('select[name="Country"] option:selected').data('states') == false)
+				{
+					$('input[name="State"]').val('').show();
+					$('select[name="StateCode"]').html('').val('').hide();
+				}
+				else
+				{
+					$.post('<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('getStates', 'url'); ?>', { 'country' : $('select[name="Country"]').val() }, function(data)
+					{
+						if(data != undefined && data.type != undefined && data.type == 'select')
+						{
+							$('input[name="State"]').val('').hide();
+							$('select[name="StateCode"]').html(data.options).show();
+							$('select[name="StateCode"]').val('');
+						}
+						else
+						{
+							$('input[name="State"]').val('').show();
+							$('select[name="StateCode"]').html('').val('').hide();
+						}
+					}, 'json');
+				}
+			});
+		}
+	});
+
+</script>

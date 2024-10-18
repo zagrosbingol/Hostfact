@@ -1,0 +1,340 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-lg-9">
+
+	<div class="main-content p-a-2">
+
+		<?php if(isset($message)){ echo $message; } ?>
+
+		<h1><?php echo __('billing data'); ?></h1>
+
+		<?php
+		if(isset($modification_html) && $modification_html)
+		{
+			echo $modification_html;
+		}
+
+		if(isset($debtor->InvoiceCountry))
+		{
+			?>
+
+			<div id="general-data" class="<?php echo ($general_data_is_used === FALSE || isset($_POST['InvoiceCompanyName'])) ? 'hide' : ''; ?>">
+				<p><?php echo __('billing data uses general data'); ?></p>
+
+				<dl class="dl-horizontal">
+					<?php
+					if($debtor->CompanyName)
+					{
+						?>
+						<dt class="col-sm-4"><?php echo __('companyname'); ?></dt>
+						<dd class="col-sm-8"><?php echo normalize($debtor->CompanyName); ?></dd>
+						<?php
+					}
+					?>
+					<dt class="col-sm-4"><?php echo __('name'); ?></dt>
+					<dd class="col-sm-8"><?php echo \Settings_Model::getGenderTranslation($debtor->Sex) . ' ' . normalize($debtor->Initials) . ' ' . normalize($debtor->SurName); ?></dd>
+					<dt class="col-sm-4"><?php echo __('address'); ?></dt>
+					<dd class="col-sm-8">
+						<?php
+							echo normalize($debtor->Address);
+							if(Settings_Model::get('IS_INTERNATIONAL') && $debtor->Address2)
+							{
+								echo '<br />' . normalize($debtor->Address2);
+							}
+						?>
+					</dd>
+					<dt class="col-sm-4"><?php echo __('zipcode') . ' ' . __('and') . ' ' . __('city'); ?></dt>
+					<dd class="col-sm-8"><?php echo normalize($debtor->ZipCode) . ' ' . normalize($debtor->City); ?></dd>
+					<?php
+						if(Settings_Model::get('IS_INTERNATIONAL') && $debtor->State)
+						{
+							?>
+							<dt class="col-sm-4"><?php echo __('state'); ?></dt>
+							<dd class="col-sm-8">
+								<?php
+								if(isset(Settings_Model::$states[$debtor->Country]))
+								{
+									echo normalize(Settings_Model::$states[$debtor->Country][$debtor->State]);
+								}
+								else
+								{
+									echo normalize($debtor->State);
+								}
+								?>
+							</dd>
+							<?php
+						}
+					?>
+					<dt class="col-sm-4"><?php echo __('country'); ?></dt>
+					<dd class="col-sm-8"><?php echo normalize(Settings_Model::$countries[$debtor->Country]); ?></dd>
+					<dt class="col-sm-4"><?php echo __('emailaddress'); ?></dt>
+					<dd class="col-sm-8"><?php echo normalize(check_email_address($debtor->EmailAddress, 'convert', ', ')); ?></dd>
+				</dl>
+
+				<br>
+				<a href="" id="change-billing-data">
+					<?php echo __('use different billing data'); ?>
+				</a>
+			</div>
+
+			<div id="different-billing-data" class="<?php echo ($general_data_is_used === FALSE || isset($_POST['InvoiceCompanyName'])) ? '' : 'hide'; ?>">
+
+				<div class="col-xs-12">
+					<a href="" class="pull-xs-right" id="copy-general-data"><?php echo __('copy general data'); ?></a>
+					<input type="hidden" name="CompanyName" value="<?php echo normalize($debtor->CompanyName); ?>">
+					<input type="hidden" name="Sex" value="<?php echo normalize($debtor->Sex); ?>">
+					<input type="hidden" name="Initials" value="<?php echo normalize($debtor->Initials); ?>">
+					<input type="hidden" name="SurName" value="<?php echo normalize($debtor->SurName); ?>">
+					<input type="hidden" name="Address" value="<?php echo normalize($debtor->Address); ?>">
+					<?php
+						if(Settings_Model::get('IS_INTERNATIONAL'))
+						{
+							?>
+							<input type="hidden" name="Address2" value="<?php echo normalize($debtor->Address2); ?>">
+							<input type="hidden" name="State" value="<?php echo normalize($debtor->State); ?>">
+							<?php
+						}
+					?>
+					<input type="hidden" name="Country" value="<?php echo normalize($debtor->Country); ?>">
+					<input type="hidden" name="ZipCode" value="<?php echo normalize($debtor->ZipCode); ?>">
+					<input type="hidden" name="City" value="<?php echo normalize($debtor->City); ?>">
+					<input type="hidden" name="EmailAddress" value="<?php echo normalize(check_email_address($debtor->EmailAddress, 'convert', ', ')); ?>">
+				</div>
+
+				<form id="form-billing-data" class="m-t-2" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('debtor', 'url'); ?>/<?php echo __('billingData', 'url'); ?>">
+
+					<h2><?php echo __('personal data'); ?></h2>
+
+					<div class="row">
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('companyname'); ?></label>
+							<input class="form-control" type="text" name="InvoiceCompanyName"
+								   value="<?php echo ($debtor->InvoiceCompanyName) ? normalize($debtor->InvoiceCompanyName) : normalize($debtor->CompanyName); ?>">
+						</div>
+
+						<div class="clearfix hidden-sm-down"></div>
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('initials'); ?></label>
+							<br/>
+							<div class="row small-gutter">
+								<div class="col-md-4">
+									<select class="form-control" name="InvoiceSex">
+										<?php
+										foreach(Settings_Model::$sexes as $key => $_sex)
+										{
+											?>
+											<option value="<?php echo $key ?>" <?php echo ($key == $debtor->InvoiceSex) ? 'selected="selected"' : '' ?>>
+												<?php echo normalize($_sex); ?>
+											</option>
+											<?php
+										}
+										?>
+									</select>
+								</div>
+								<div class="clearfix hidden-md-up small-margin-top"></div>
+								<div class="col-md-8">
+									<input class="form-control" type="text" name="InvoiceInitials"
+										   value="<?php echo ($debtor->InvoiceInitials) ? normalize($debtor->InvoiceInitials) : normalize($debtor->Initials); ?>">
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('surname'); ?></label>
+							<input class="form-control" type="text" name="InvoiceSurName"
+								   value="<?php echo ($debtor->InvoiceSurName) ? normalize($debtor->InvoiceSurName) : normalize($debtor->SurName); ?>">
+						</div>
+					</div>
+
+					<h2><?php echo __('address data'); ?></h2>
+
+					<div class="row">
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('address'); ?></label>
+							<input class="form-control" type="text" name="InvoiceAddress"
+								   value="<?php echo ($debtor->InvoiceAddress) ? normalize($debtor->InvoiceAddress) : normalize($debtor->Address); ?>">
+							<?php
+								if(Settings_Model::get('IS_INTERNATIONAL'))
+								{
+									?>
+									<input class="form-control small-margin-top" type="text" name="InvoiceAddress2"
+										   value="<?php echo ($debtor->InvoiceAddress2) ? normalize($debtor->InvoiceAddress2) : normalize($debtor->Address2); ?>">
+									<?php
+								}
+							?>
+						</div>
+
+						<?php
+							if(Settings_Model::get('IS_INTERNATIONAL'))
+							{
+								?>
+								<div class="clearfix hidden-sm-down"></div>
+								<?php
+							}
+						?>
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('zipcode'); ?></label>
+							<input class="form-control" type="text" name="InvoiceZipCode"
+								   value="<?php echo ($debtor->InvoiceZipCode) ? normalize($debtor->InvoiceZipCode) : normalize($debtor->ZipCode); ?>">
+						</div>
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('city'); ?></label>
+							<input class="form-control" type="text" name="InvoiceCity"
+								   value="<?php echo ($debtor->InvoiceCity) ? normalize($debtor->InvoiceCity) : normalize($debtor->City); ?>">
+						</div>
+
+						<?php
+						if(Settings_Model::get('IS_INTERNATIONAL'))
+						{
+							?>
+							<div class="col-md-6 form-group">
+								<label><?php echo __('state'); ?></label>
+
+								<select class="form-control <?php if(!isset(Settings_Model::$states[$debtor->InvoiceCountry])){ echo "hide"; } ?>" name="InvoiceStateCode">
+									<?php
+									if(isset(Settings_Model::$states[$debtor->InvoiceCountry]))
+									{
+										foreach(Settings_Model::$states[$debtor->InvoiceCountry] as $key => $_state)
+										{
+											?>
+											<option value="<?php echo $key ?>" <?php echo ($key == $debtor->InvoiceState) ? 'selected="selected"' : '' ?>>
+												<?php echo normalize($_state) ?>
+											</option>
+											<?php
+										}
+									}
+									?>
+								</select>
+								<input class="form-control <?php if(isset(Settings_Model::$states[$debtor->InvoiceCountry])){ echo "hide"; } ?>" type="text" name="InvoiceState" value="<?php echo ($debtor->InvoiceState) ? normalize($debtor->InvoiceState) : normalize($debtor->State); ?>">
+							</div>
+							<?php
+						}
+						?>
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('country'); ?></label>
+							<br/>
+							<select class="form-control" name="InvoiceCountry">
+								<?php
+								foreach(Settings_Model::$countries as $key => $_country)
+								{
+									$has_states = (isset(Settings_Model::$states[$key])) ? 'true' : 'false';
+									?>
+									<option value="<?php echo $key ?>" <?php echo ($key == $debtor->InvoiceCountry) ? 'selected="selected"' : '' ?> data-states="<?php echo $has_states; ?>">
+										<?php echo normalize($_country); ?>
+									</option>
+									<?php
+								}
+								?>
+							</select>
+						</div>
+
+					</div>
+
+					<h2><?php echo __('contact data'); ?></h2>
+
+					<div class="row">
+
+						<div class="col-md-6 form-group">
+							<label><?php echo __('emailaddress'); ?></label>
+							<input class="form-control" type="text" name="InvoiceEmailAddress"
+								   value="<?php echo (isset($_POST['InvoiceEmailAddress'])) ? normalize($_POST['InvoiceEmailAddress']) : (($debtor->InvoiceEmailAddress) ? normalize(check_email_address($debtor->InvoiceEmailAddress, 'convert', ', ')) : normalize(check_email_address($debtor->EmailAddress, 'convert', ', '))); ?>">
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="offset-sm-2 col-sm-10">
+							<button type="submit" class="btn btn-primary pull-xs-right"><?php echo __('save data'); ?></button>
+						</div>
+					</div>
+
+				</form>
+			</div>
+
+			<?php
+		}
+		?>
+
+	</div>
+</div>
+
+<?php validate_input($debtor->ErrorFields); ?>
+
+<script type="application/javascript">
+
+	$(function()
+	{
+		// toggle companyname fields, if the companyname is set or not
+		$('#copy-general-data').click( function(e)
+		{
+			e.preventDefault();
+			$(this).parent().children('input').each( function()
+			{
+				$('form#form-billing-data input[name="Invoice' + $(this).attr('name') + '"]').val($(this).val());
+				$('form#form-billing-data select[name="Invoice' + $(this).attr('name') + '"]').val($(this).val());
+			});
+
+			if($('input[name="InvoiceState"').length > 0)
+			{
+				getCountryStates($('input[name="Country"]').val(), $('input[name="State"]').val());
+			}
+
+			return;
+		});
+
+		$('#change-billing-data').click( function(e)
+		{
+			e.preventDefault();
+			$('#general-data').hide();
+			$('#different-billing-data').show();
+			return;
+		});
+
+		// support for states, switch the input/select (and fill the select with states) based on the chosen country
+		if($('input[name="InvoiceState"').length > 0)
+		{
+			$('#different-billing-data').on('change', 'select[name="InvoiceCountry"]', function()
+			{
+				// no need to do a ajax call to get states if country has none
+				if($('select[name="InvoiceCountry"] option:selected').data('states') != undefined && $('select[name="InvoiceCountry"] option:selected').data('states') == false)
+				{
+					$('input[name="InvoiceState"]').val('').show();
+					$('select[name="InvoiceStateCode"]').html('').val('').hide();
+				}
+				else
+				{
+					getCountryStates($('select[name="InvoiceCountry"]').val(), '');
+				}
+			});
+		}
+
+	});
+
+	function getCountryStates(countrycode, value)
+	{
+		$.post('<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('getStates', 'url'); ?>', { 'country' : countrycode }, function(data)
+		{
+			if(data != undefined && data.type != undefined && data.type == 'select')
+			{
+				$('input[name="InvoiceState"]').val('').hide();
+				$('select[name="InvoiceStateCode"]').html(data.options).show();
+				$('select[name="InvoiceStateCode"]').val(value);
+			}
+			else
+			{
+				$('input[name="InvoiceState"]').val(value).show();
+				$('select[name="InvoiceStateCode"]').html('').val('').hide();
+			}
+		}, 'json');
+	}
+
+</script>

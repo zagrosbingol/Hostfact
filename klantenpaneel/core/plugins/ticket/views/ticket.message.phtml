@@ -1,0 +1,19 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<style type="text/css">
+	body, html {
+		padding:0;margin:0;
+	}
+	img {
+		max-width:100%;
+		width: auto;
+		height: auto;
+	}
+</style>
+<div style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;font-size: .9rem;line-height: 1.5;color: #666;">
+	<?php echo xss_clean($message['Message']); ?>
+</div>

@@ -1,0 +1,63 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="sidebar-column p-t-1">
+
+	<form class="m-b-2 form-list-search" role="search">
+		<input type="text" class="form-control" placeholder="<?php echo __('search'); ?>" id="list-search">
+	</form>
+
+
+	<div id="list-items">
+
+		<h3 class="m-b-1 m-t-2">
+			<a class="hidden-lg-up" data-toggle="collapse" href="#list-group-ticket" aria-controls="list-group-ticket">
+				<?php echo __('tickets'); ?>
+			</a>
+			<span class="hidden-md-down"><?php echo __('tickets'); ?></span>
+			<span class="tag tag-default tag-pill pull-xs-right result-count"><?php echo ($ticket_list) ? count($ticket_list) : 0; ?></span>
+		</h3>
+
+		<div class="list-group full-width collapse collapse-md-up row scrollable-list" id="list-group-ticket">
+
+			<?php
+			// Button for new ticket...
+			?>
+			<a href="<?php echo __SITE_URL . '/' . __('ticket', 'url') . '/' . __('create', 'url'); ?>" class="list-group-item list-group-item-action text-truncate text-xs-center <?php if($this->ControllerName == 'ticket' && $this->ActionName == 'create'){ echo ' active'; } ?>">
+				<span class="fas fa-plus"></span> <?php echo __('create ticket'); ?>
+			</a>
+
+			<?php
+			if(!empty($ticket_list))
+			{
+				foreach($ticket_list as $_item)
+				{
+					$active = (isset($ticket->id) && $_item['Identifier'] == $ticket->id) ? ' active' : '';
+					?>
+					<a href="<?php echo __SITE_URL . '/' . __('ticket', 'url') . '/' . __('view', 'url') . '/' . $_item['Identifier']; ?>" class="list-group-item list-group-item-action <?php echo $active; ?> text-truncate" data-search-term="<?php echo strtolower(normalize($_item['TicketID'] . ' ' . $_item['Subject'])); ?>">
+						<?php if($_item['Status'] != '3')
+						{
+							echo '<b>' . normalize($_item['Subject']) . '</b>';
+						}
+						else
+						{
+							echo normalize($_item['Subject']);
+						} ?>
+
+						<div class="text-muted clearfix">
+							<small class="text-muted pull-xs-left"><?php echo normalize($_item['TicketID']); ?></small>
+							<small class="text-muted pull-xs-right"><?php echo rewrite_date_db2site($_item['LastDate']) . ' ' . __('at') . ' ' . rewrite_date_db2site($_item['LastDate'], 'H:i'); ?></small>
+						</div>
+					</a>
+					<?php
+				}
+			}
+			?>
+			<a id="list-search-noresult" class="list-group-item hide"><?php echo __('no search results found'); ?></a>
+		</div>
+	</div>
+
+</div>

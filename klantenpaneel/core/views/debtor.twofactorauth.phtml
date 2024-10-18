@@ -1,0 +1,78 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+	<script src="<?php echo __SITE_URL . '/asset/js/twofactorauth.js'; ?>"></script>
+	<div class="col-lg-9">
+
+		<div class="main-content p-a-2">
+			<?php if(isset($message))
+			{
+				echo $message;
+			}
+			?>
+			<?php
+				if($TwoFactorAuthentication == 'on')
+				{
+					?>
+					<h1><?php echo __('two step authentication'); ?></h1>
+
+					<p><?php echo __('two step authentication - already active'); ?></p>
+					<?php
+					$this->showElement('debtor.twofactorauth.deactivate');
+				}
+				else
+				{
+					?>
+					<h1><?php echo __('two step authentication'); ?></h1>
+
+					<p><?php echo __('two step authentication - text'); ?></p>
+
+					<br>
+
+					<h2 class="m-t-2"><?php echo __('two step authentication - apps'); ?></h2>
+					<hr>
+
+					<ul>
+						<li><a target="_blank" href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Google authenticator (Android)</a></li>
+						<li><a target="_blank" href="https://itunes.apple.com/app/google-authenticator/id388497605">Google authenticator (iOS)</a></li>
+						<li><a target="_blank" href="https://www.winauth.com/">WinAuth authenticator (Windows)</a></li>
+						<li><a target="_blank" href="https://www.authy.com/">Authy authenticator (Mac)</a></li>
+					</ul>
+
+					<br>
+
+					<h2 class="m-t-2"><?php echo __('two step authentication - generate code'); ?></h2>
+					<hr>
+					<p><?php echo __('two step authentication - generate code text'); ?></p>
+					<a tabindex="0" role="button" data-baseurl="<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('twoFactorGenerateKey', 'url'); ?>"  class="two-factor-auth-link <?php if($showCode){ ?>hide<?php } ?>"><?php echo __('two step authentication - generate code link'); ?></a>
+
+					<div id="two-factor-auth-code" <?php if(!$showCode){ ?>class="hide"<?php } ?>>
+						<div class="text-xl-center p-a-1">
+							<div class="auth_key"><?php if($showCode){ echo $auth_key; } ?></div>
+							<img class="qr_code" width="150" height="150" style="margin: 0px auto;" <?php if($showCode){ echo 'src="https://chart.googleapis.com/chart?chs=150x150&chld=M|0&cht=qr&chl=' . $qr_url . '"'; } ?>>
+						</div>
+						<?php echo __('two step authentication - activate text'); ?>
+						<form name="two-factor-auth-generate-key" class="m-t-2" method="post" action="">
+
+							<div class="form-group row">
+								<label class="col-sm-3 form-control-label"><?php echo __('two step authentication - auth code'); ?></label>
+								<div class="col-sm-6">
+									<input class="form-control" type="text" name="authCode" value="">
+								</div>
+							</div>
+
+							<div class="form-group row">
+								<div class="offset-sm-2 col-sm-10 m-t-1">
+									<button id="submit_accept_button" type="submit" class="btn btn-primary pull-xs-right disabled"><?php echo __('two step authentication - submit'); ?></button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<?php
+				}
+			?>
+		</div>
+	</div>

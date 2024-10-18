@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
+	
+	<title><?php echo __('payment page title'); ?></title>
+	<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+	<script type="text/javascript" src="js/payment.js"></script>
+	<link type="text/css" href="css/payment.css" rel="stylesheet" />
+</head>
+
+<body>
+
+	<div id="wrapper">
+		
+		<?php if(CLIENTAREA_LOGO_URL){ ?>
+		<img src="<?php echo CLIENTAREA_LOGO_URL; ?>" class="logo_img"/>
+		<?php } ?>
+				
+		<?php if(isset($error_message) && $error_message){ ?>
+		<div class="errorbox">
+			<?php echo $error_message; ?>
+		</div>
+		<br /><br />
+		<?php } ?>

@@ -1,0 +1,29 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<form class="form-signin m-t-1 m-b-2 text-xs-left" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('login', 'url'); ?>">
+
+	<?php
+	if (isset($message))
+	{
+		echo $message;
+	}
+	?>
+
+	<!--[if IE 9]><label><?php echo __('username'); ?></label><![endif]-->
+	<input type="text" class="form-control m-b-1" name="Username" placeholder="<?php echo __('username'); ?>" required="" autofocus="">
+
+	<!--[if IE 9]><label><?php echo __('password'); ?></label><![endif]-->
+	<input type="password" class="form-control" name="Password" placeholder="<?php echo __('password'); ?>" required="">
+
+	<button class="btn btn-primary btn-block m-t-1" type="submit"><?php echo __('login'); ?></button>
+
+</form>
+
+<a href="<?php echo __SITE_URL . '/' . __('login', 'url') . '/' . __('forgotPassword', 'url'); ?>" class="text-muted to-forgot-password">
+	<?php echo __('forgot password'); ?>
+</a>
+

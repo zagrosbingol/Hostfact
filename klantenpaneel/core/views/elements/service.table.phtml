@@ -1,0 +1,53 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+
+if(!empty($service_list))
+{
+	?>
+	<div class="m-b-2">
+		<table class="table m-t-lg table-striped">
+			<colgroup>
+				<col class="col-md-8 col-xs-10">
+				<col class="col-md-3 hidden-sm-down">
+				<col class="col-md-1 col-xs-2 hidden-xs-down" span="2">
+			</colgroup>
+			<thead>
+			<tr>
+				<th><?php echo __('other service'); ?></th>
+				<th class="text-nowrap hidden-sm-down"><?php echo __('next invoice date'); ?></th>
+				<th class="text-nowrap hidden-xs-down" colspan="2"><?php echo (Settings_Model::get('SHOW_AMOUNT_VAT') == 'incl') ? __('amountIncl') : __('amountExcl'); ?></th>
+			</tr>
+			</thead>
+			<tbody>
+			<?php
+			foreach($service_list as $_service)
+			{
+				?>
+				<tr>
+					<td>
+						<?php
+						if(isset($_service['Subscription']) && ($_service['Subscription']['Number'] != 1 || $_service['Subscription']['NumberSuffix']))
+						{
+							$suffix = ($_service['Subscription']['NumberSuffix']) ? ' ' . normalize($_service['Subscription']['NumberSuffix']) : 'x';
+							echo showNumber($_service['Subscription']['Number']) . $suffix . ' ';
+						}
+						?>
+						<a href="<?php echo __SITE_URL . '/' . __('service', 'url') . '/' . __('view', 'url') . '/' . $_service['Identifier']; ?>">
+							<?php echo normalize($_service['Subscription']['Description']); ?>
+						</a>
+					</td>
+					<?php echo service_date_amount_td($_service); ?>
+				</tr>
+				<?php
+			}
+			?>
+
+			</tbody>
+		</table>
+	</div>
+	<?php
+}
+?>

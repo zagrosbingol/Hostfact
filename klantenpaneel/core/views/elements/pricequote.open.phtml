@@ -1,0 +1,38 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<table class="table m-t-lg table-striped">
+		<colgroup>
+			<col class="col-sm-3 col-xs-8">
+			<col class="col-sm-7 hidden-xs-down">
+			<col class="col-sm-2 col-xs-4" span="2">
+		</colgroup>
+		<thead>
+		<tr>
+			<th><?php echo __('pricequote nr'); ?></th>
+			<th class="hidden-xs-down"><?php echo __('pricequote date'); ?></th>
+			<th class="text-xs-right text-nowrap"><?php echo __('expiration date'); ?></th>
+		</tr>
+		</thead>
+		<tbody>
+		<?php
+			foreach($open_pricequotes as $_pricequote)
+			{
+				?>
+				<tr>
+					<td>
+						<a href="<?php echo __SITE_URL . '/' . __('pricequote', 'url') . '/' . __('view', 'url') . '/' . $_pricequote['Identifier']; ?>">
+							<?php echo normalize($_pricequote['PriceQuoteCode']); ?>
+						</a>
+					</td>
+					<td class="hidden-xs-down"><?php echo rewrite_date_db2site($_pricequote['Date']); ?></td>
+					<td class="text-xs-right text-nowrap"><?php echo rewrite_date_db2site($_pricequote['ExpirationDate']); ?></td>
+				</tr>
+				<?php
+			}
+		?>
+		</tbody>
+	</table>

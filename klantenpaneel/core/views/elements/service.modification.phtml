@@ -1,0 +1,72 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+
+// shows a warning about a pending modification, shows a link and modal for canceling the modification
+if(!empty($service->ClientareaModifications[$this->modificationtype]))
+{
+	$_modification_data = $service->ClientareaModifications[$this->modificationtype];
+	?>
+	<div class="alert alert-warning" role="alert">
+	<p>
+		<?php
+        if ($_modification_data['Status'] == 'error') {
+            $_modification_warning = 'warning ' . $this->modificationtype . ' modification error';
+        } else {
+            $_modification_warning = 'warning ' . $this->modificationtype . ' modification awaiting approval';
+        }
+
+        echo sprintf(__($_modification_warning), rewrite_date_db2site($_modification_data['Modified']) . ' ' . __('at') . ' ' . rewrite_date_db2site($_modification_data['Modified'], 'H:i'));
+		?>
+		<a href="" data-toggle="modal" data-target="#cancel-modification" data-backdrop="static">
+			<?php echo __('cancel modification'); ?>
+		</a>
+	</p>
+	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="cancel-modification" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="form">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						<?php echo __('cancel modification?'); ?>
+					</h4>
+				</div>
+
+				<?php
+				if (isset($message))
+				{
+					echo $message;
+					unset($message);
+				}
+				?>
+
+				<form id="form-cancel-modification" class="" method="post" action="<?php echo __SITE_URL . '/' . $ServiceUrlString . '/'. __('cancelModification', 'url'); ?>">
+
+					<input type="hidden" name="ServiceID" value="<?php echo $service->id; ?>" />
+					<input type="hidden" name="ServiceType" value="<?php echo $servicetype; ?>" />
+					<input type="hidden" name="ModificationType" value="<?php echo $modificationtype; ?>" />
+
+					<div class="modal-body">
+						<?php echo __('cancel modification are you sure'); ?>
+						<br /><br />
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary pull-left" data-dismiss="modal"><?php echo __('cancel'); ?></button>
+						<button type="submit" class="btn btn-danger"><?php echo __('undo'); ?></button>
+					</div>
+
+				</form>
+
+			</div>
+		</div>
+	</div>
+	<?php
+}

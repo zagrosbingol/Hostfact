@@ -1,0 +1,134 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Client area notification</title>
+	<style type='text/css'>
+		<!--
+		body {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			color: #000000;
+		}
+		p {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			line-height: 1.8em;
+		}
+		a, a:visited, a:active {
+			text-decoration: underline;
+			color: #1b5cce;
+		}
+
+		a:hover {
+			text-decoration: none;
+			color: #1b5cce;
+		}
+		-->
+	</style>
+</head>
+<body>
+
+<br />
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<td width="100%" align="center">
+
+			<table border="0" cellpadding="0" cellspacing="0" width="680">
+				<tr>
+					<td width="680" align="left">
+
+						<h2>Payment details of [debtor-&gt;DebtorCode] are edited</h2>
+
+						<p style="line-height: 1.8em;">
+							On <?php echo date('d-m-Y').' at '.date('H:i'); ?> the client <a href="<?php echo BACKOFFICE_URL ?>debtors.php?page=edit&id=[debtor-&gt;Identifier]"><?php if($debtorOld->CompanyName != ''){ ?>[debtorOld-&gt;CompanyName]<?php }else{ ?>[debtorOld-&gt;Initials] [debtorOld-&gt;SurName]<?php } ?></a> has changed their payment details.
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<td width="680" align="center">
+						<br />
+						<hr />
+						<table border="0" cellpadding="5" cellspacing="0" width="100%">
+							<tr>
+								<td></td>
+								<td><strong>Current details</strong></td>
+								<td><strong>New details</strong></td>
+							</tr>
+
+								<tr>
+									<td>Direct debit:</td>
+									<td><?php global $array_mailingoptin; echo $array_mailingoptin[$debtorOld->InvoiceAuthorisation]; ?></td>
+									<td><?php if($debtorChanged->InvoiceAuthorisation != $debtorOld->InvoiceAuthorisation){ echo $array_mailingoptin[$debtorChanged->InvoiceAuthorisation]; } ?></td>
+								</tr>
+								<tr>
+									<td>Bank account number:</td>
+									<td><?php echo $debtorOld->AccountNumber; ?></td>
+									<td><?php if($debtorChanged->AccountNumber != $debtorOld->AccountNumber){ echo ($debtorChanged->AccountNumber) ? $debtorChanged->AccountNumber : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>Bank account holder:</td>
+									<td><?php echo $debtorOld->AccountName; ?></td>
+									<td><?php if($debtorChanged->AccountName != $debtorOld->AccountName){ echo ($debtorChanged->AccountName) ? $debtorChanged->AccountName : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>Bank:</td>
+									<td><?php echo $debtorOld->AccountBank; ?></td>
+									<td><?php if($debtorChanged->AccountBank != $debtorOld->AccountBank){ echo ($debtorChanged->AccountBank) ? $debtorChanged->AccountBank : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>Bank city:</td>
+									<td><?php echo $debtorOld->AccountCity; ?></td>
+									<td><?php if($debtorChanged->AccountCity != $debtorOld->AccountCity){ echo ($debtorChanged->AccountCity) ? $debtorChanged->AccountCity : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>BIC:</td>
+									<td><?php echo $debtorOld->AccountBIC; ?></td>
+									<td><?php if($debtorChanged->AccountBIC != $debtorOld->AccountBIC){ echo ($debtorChanged->AccountBIC) ? $debtorChanged->AccountBIC : '-'; } ?></td>
+								</tr>
+						</table>
+
+						<hr />
+					</td>
+
+				</tr>
+				<tr>
+					<td width="680" align="left">
+
+						<br />
+
+						<h2>What do I need to do to process the adjustments?</h2>
+						<?php if($debtorChanged->ClientareaProfileObject->Rights['CLIENTAREA_DEBTOR_PAYMENTDATA_CHANGE'] == 'approve'){ ?>
+							<p style="line-height: 1.8em;">You can approve, adjust or decline the request for adjustments via HostFact. Clicking on the link below, will directly take you to the page of the client.</p>
+						<?php }else{ ?>
+							<p style="line-height: 1.8em;">You don't have to do anything, because your settings state that all adjustments to personal details may be processed automatically. The adjustments have already been processed. This email is only a notification.</p>
+						<?php } ?>
+
+						<br />
+
+						<p>
+							<a href="<?php echo BACKOFFICE_URL ?>debtors.php?page=edit&id=[debtor-&gt;Identifier]">Go to the client in HostFact</a>
+						</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td width="680" align="center">
+
+						<br /><br />
+
+						<font style="color:#666666;font-size:0.8em">This is an automatically generated email from your HostFact</font>
+
+					</td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+
+<br /><br />
+
+</body>
+</html>

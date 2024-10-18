@@ -1,0 +1,120 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2">
+
+	<?php
+	if (isset($message))
+	{
+		echo $message;
+	}
+
+	$this->showElement('service.terminate');
+
+    $wildcard_prefix = ($service->Wildcard == 'yes') ? '*.' : '';
+	?>
+
+	<h1><?php echo __('ssl certificate') . ' ' . normalize($wildcard_prefix.$service->CommonName); ?></h1>
+
+	<?php
+		show_termination_warning($service);
+	?>
+
+	<div class="row m-t-1">
+
+		<div class="col-sm-12">
+
+			<?php
+			// only show buttons for SSL certificate with a registrar
+			if(isset($service->RegistrarInfo['Class']) && $service->RegistrarInfo['Class'])
+			{
+				// Install button for active and installable certificate.
+				if(in_array($service->Status, ['install','active']) && Settings_Model::get('CLIENTAREA_SSL_DOWNLOAD') == 'yes')
+				{
+					?>
+					<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('ssl', 'url') . '/' . __('download', 'url') . '/' . $service->id; ?>" data-spinner="true">
+						<span class="fas fa-file-o fa-2x"></span>
+						<br/>
+						<div><?php echo __('ssl download certificate'); ?></div>
+					</a>
+					<?php
+				}
+
+				// Reissue button only for active certificate.
+				if($service->Status == 'active' && Settings_Model::get('CLIENTAREA_SSL_REISSUE') == 'yes')
+				{
+					?>
+
+					<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('ssl', 'url') . '/' . __('reissue', 'url') . '/' . $service->id; ?>" data-spinner="true">
+						<span class="fas fa-exchange-alt fa-2x"></span>
+						<br/>
+						<div><?php echo __('reissue ssl certificate'); ?></div>
+					</a>
+					<?php
+				}
+			}
+			?>
+
+		</div>
+	</div>
+
+	<div class="row">
+
+		<div class="col-md-9 col-sm-12">
+
+			<h2><?php echo __('ssl certificate'); ?></h2>
+
+			<dl class="dl-horizontal">
+				<dt class="col-sm-4">
+					<?php
+						echo ($service->MultiDomain == 'yes' && !empty($service->MultiDomainRecords)) ? __('domains') : __('domain');
+					?>
+				</dt>
+				<dd class="col-sm-8">
+					<?php
+					echo normalize($wildcard_prefix.$service->CommonName) . '<br />';
+					if($service->MultiDomain == 'yes' && !empty($service->MultiDomainRecords))
+					{
+						foreach($service->MultiDomainRecords as $_domain)
+						{
+							echo normalize($_domain) . '<br />';
+						}
+					}
+					?>
+				</dd>
+				<?php
+
+				if($service->Status == 'active')
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('certificate valid until'); ?></dt>
+					<dd class="col-sm-8"><?php echo rewrite_date_db2site($service->RenewDate); ?></dd>
+
+					<dt class="col-sm-4"><?php echo __('period'); ?></dt>
+					<dd class="col-sm-8"><?php echo $service->Period . ' ' . __('year'); ?></dd>
+					<?php
+				}
+
+				if($service->Status != 'active')
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('status'); ?></dt>
+					<dd class="col-sm-8"><?php echo __($service->Status, 'array_sslstatus'); ?></dd>
+					<?php
+				}
+				?>
+			</dl>
+		</div>
+
+	</div>
+
+	<?php
+		$this->showElement('service.subscription');
+	?>
+
+</div>
+</div>

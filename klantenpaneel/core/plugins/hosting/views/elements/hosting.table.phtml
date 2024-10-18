@@ -1,0 +1,49 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+
+if(!empty($list_hosting))
+{
+	?>
+	<div class="m-b-2">
+
+		<table class="table m-t-lg table-striped">
+			<colgroup>
+				<col class="col-md-3 col-xs-5">
+				<col class="col-md-5 col-xs-5">
+				<col class="col-md-3 hidden-sm-down">
+				<col class="col-md-1 col-xs-2 hidden-xs-down" span="2">
+			</colgroup>
+			<thead>
+			<tr>
+				<th><?php echo __('hostingaccount'); ?></th>
+				<th><?php echo __('domain'); ?></th>
+				<th class="text-nowrap hidden-sm-down"><?php echo __('next invoice date'); ?></th>
+				<th class="text-nowrap hidden-xs-down" colspan="2"><?php echo (Settings_Model::get('SHOW_AMOUNT_VAT') == 'incl') ? __('amountIncl') : __('amountExcl'); ?></th>
+			</tr>
+			</thead>
+			<tbody>
+			<?php
+			foreach($list_hosting as $_hosting)
+			{
+				?>
+				<tr>
+					<td>
+						<a href="<?php echo __SITE_URL . '/' . __('hosting', 'url') . '/' . __('view', 'url') . '/' . $_hosting['Identifier']; ?>">
+							<?php echo normalize($_hosting['Username']); ?>
+						</a>
+					</td>
+					<td><?php echo normalize($_hosting['Domain']); ?></td>
+					<?php echo service_date_amount_td($_hosting); ?>
+				</tr>
+				<?php
+			}
+			?>
+			</tbody>
+		</table>
+	</div>
+	<?php
+}
+?>

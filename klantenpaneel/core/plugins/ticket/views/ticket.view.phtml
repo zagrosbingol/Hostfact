@@ -1,0 +1,175 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+	<div class="main-content p-a-2">
+
+		<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+		?>
+
+		<?php
+		if($ticket->Status < 3)
+		{
+			?>
+			<a href="<?php echo __SITE_URL . '/' . __('ticket', 'url') . '/' . __('close', 'url') . '/' . $ticket->id; ?>" class="h1-small pull-xs-right hidden-xs-down"><?php echo __('close ticket'); ?></a>
+			<?php
+		}
+		?>
+
+		<h1>
+			<?php echo __('ticket') . ' ' . normalize($ticket->TicketID); ?>
+		</h1>
+
+		<div class="row">
+
+			<div class="col-sm-12">
+
+				<dl class="dl-horizontal">
+
+					<dt class="col-sm-2"><?php echo __('subject'); ?></dt>
+					<dd class="col-sm-10"><?php echo normalize($ticket->Subject); ?></dd>
+
+					<dt class="col-sm-2"><?php echo __('status'); ?></dt>
+					<dd class="col-sm-10"><?php echo __($ticket->Status, 'array_ticketstatus'); ?>
+						<?php
+						if($ticket->Status < 3)
+						{
+							?>
+							<a href="<?php echo __SITE_URL . '/' . __('ticket', 'url') . '/' . __('close', 'url') . '/' . $ticket->id; ?>" class="pull-xs-right hidden-sm-up"><?php echo __('close ticket'); ?></a>
+							<?php
+						}
+						?>
+					</dd>
+
+				</dl>
+			</div>
+
+		</div>
+
+		<?php
+		// Load reply ticket HTML
+		$this->showElement('ticket.reply');
+		?>
+
+		<h2><?php echo sprintf(__('ticket messages'), count($ticket->TicketMessages)); ?></h2>
+		<hr />
+
+		<?php
+		foreach($ticket->TicketMessages as $_message)
+		{
+			$ticket_from = ($_message['SenderID'] > 0) ? 'company' : 'client';
+			?>
+			<div data-div="message" class="m-b-3<?php if($ticket_from == 'company'){ echo ' ticket-company'; } ?>">
+
+				<div data-div="sender" class="p-b-1 clearfix text-truncate">
+					<?php
+					if($ticket_from == 'client')
+					{
+						?>
+						<span class="pull-xs-right text-xs-right">
+							<?php
+							echo '<b>'.normalize($_message['SenderName']).'</b>';
+							if($_message['SenderEmail'])
+							{
+								echo '<span class="hidden-xs-down">'.normalize(' <' . $_message['SenderEmail'] . '>').'</span>';
+							}
+							echo '<br /><small class="text-muted">'.rewrite_date_db2site($_message['Date']) . ' '.__('at').' '. rewrite_date_db2site($_message['Date'], 'H:i').'</small>';
+							?>
+						</span>
+						<?php
+					}
+					else
+					{
+						?>
+						<span>
+							<?php
+							echo '<b>'.normalize($_message['EmployeeName']).' - '.normalize($_message['SenderName']).'</b>';
+							echo '<br /><small class="text-muted">'.rewrite_date_db2site($_message['Date']) . ' '.__('at').' '. rewrite_date_db2site($_message['Date'], 'H:i').'</small>';
+							?>
+						</span>
+						<?php
+					}
+					?>
+				</div>
+
+				<div class="card card-block p-a-0">
+
+					<?php
+					if(!empty($_message['Attachments']))
+					{
+						?>
+						<div class="row p-a-1 small">
+							<div class="col-sm-2">
+								<strong><?php echo (count($_message['Attachments']) == 1) ? __('attachment') : __('attachments'); ?>:</strong>
+							</div>
+							<div class="col-sm-10">
+								<?php
+								foreach($_message['Attachments'] as $_attachment)
+								{
+									?>
+									<a class="p-r-2 text-nowrap  text-truncate" href="<?php echo __SITE_URL . '/' . __('ticket', 'url') . '/' . __('download', 'url') . '/' . $ticket->id . '/' . $_message['Identifier'] . '/' . md5($_attachment['location']); ?>">
+										<span class="fas fa-file"></span> <?php echo normalize($_attachment['name']); ?>
+									</a>
+									<?php
+								}
+								?>
+							</div>
+						</div>
+						<hr class="m-t-0 m-b-0"/>
+						<?php
+					}
+					?>
+					<div class="ticket_iframe p-a-1">
+						<span class="hover-effect p-a-1 fas fa-search" data-event="zoom-reply" data-toggle="modal" data-target="#reply-zoom" data-backdrop="static"></span>
+						<iframe src="<?php echo __SITE_URL . '/' . __('ticket', 'url') . '/' . __('ticketmessage', 'url') . '/' . $ticket->id. '/' . $_message['Identifier']; ?>" frameborder="0"></iframe>
+					</div>
+				</div>
+			</div>
+			<?php
+		}
+		?>
+		</div>
+	</div>
+</div>
+
+<style type="text/css">
+	.ticket_iframe {
+		width:100%;
+		overflow-y:hidden;
+		overflow-x:auto;
+	}
+	.ticket_iframe iframe {
+		min-width:100%;
+	}
+	.ticket_iframe .fa-search {
+		position:absolute;
+		top:0px;
+		right:0px;
+	}
+	.ticket-company {
+		background: #f1f6f8;
+		padding: 20px;
+	}
+</style>
+
+<div class="modal fade" id="reply-zoom" tabindex="-1" role="dialog" aria-labelledby="reply-zoom" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title p-l-1 p-r-1"></h4>
+			</div>
+
+			<div id="reply-zoom-content" class="p-l-1 p-r-1 p-b-1"></div>
+		</div>
+	</div>
+</div>

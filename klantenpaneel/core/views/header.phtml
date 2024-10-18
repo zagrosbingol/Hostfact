@@ -1,0 +1,95 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Required meta tags always come first -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+	<title><?php echo (Settings_Model::get('CLIENTAREA_HEADER_TITLE')) ? normalize(Settings_Model::get('CLIENTAREA_HEADER_TITLE')) : normalize($company->CompanyName); ?></title>
+
+<?php // load all base css files, this calls an url which will get the css files and output their content ?>
+	<link rel="stylesheet" href="<?php echo __SITE_URL . '/asset/css'; ?>">
+<?php // this will autoload css files from the custom/assets/css folder ?>
+	<?php echo load_custom_assets('css'); ?>
+
+<?php // load all base js files, this calls an url which will get the js files and output their content ?>
+	<script src="<?php echo __SITE_URL . '/asset/js'; ?>"></script>
+<?php // this will autoload js files from the custom/assets/js folder ?>
+	<?php echo load_custom_assets('js'); ?>
+</head>
+
+<body>
+
+<header class="container-fluid p-t-1 p-b-1 bg-white">
+	<div class="container header-container">
+		<div class="row">
+
+			<div class="col-md-8 col-xs-12">
+				<?php
+				if(Settings_Model::get('CLIENTAREA_LOGO_URL'))
+				{
+					echo '<a href="' . __SITE_URL . '"><img src="' . Settings_Model::get('CLIENTAREA_LOGO_URL') . '" class="header-logo" /></a>';
+				}
+				elseif(Settings_Model::get('CLIENTAREA_HEADER_TITLE'))
+				{
+					echo '<div class="header-title">' . Settings_Model::get('CLIENTAREA_HEADER_TITLE') . '</div>';
+				}
+				?>
+
+			</div>
+
+			<div class="col-md-4 col-xs-12 profile-menu small-margin-top">
+
+				<div class="pull-md-right">
+					<span class="fas fa-user fa-fw text-muted"></span>
+					<?php echo normalize(($account->CompanyName) ? $account->CompanyName : $account->Initials . ' ' . $account->SurName); ?>
+				</div>
+				<br class="hidden-sm-down" />
+
+				<a href="<?php echo __SITE_URL . '/' . __('login', 'url') . '/' . __('logout', 'url');?>" class="pull-md-right pull-xs-left logout-link">
+					<?php echo __('logout'); ?>
+				</a>
+				<?php
+					if(!empty(Settings_Model::$languages))
+					{
+						?>
+						<strong class="text-primary pull-md-right pull-xs-left text-separator">&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</strong>
+
+						<div class="dropdown pull-md-right pull-xs-left language-select">
+
+							<span class="fas fa-globe fa-fw text-primary"></span>
+							<a href="#" class="dropdown-toggle language-current" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="dropdownLanguages">
+								<?php echo $available_languages[ACTIVE_LANG]; ?>
+							</a>
+
+							<div class="dropdown-menu language-dropdown" aria-labelledby="dropdownLanguages">
+							<?php
+							// set active language first in array
+							$clientarea_languages = array(ACTIVE_LANG => Settings_Model::$languages[ACTIVE_LANG]) + Settings_Model::$languages;
+
+							foreach($clientarea_languages as $_lang_key => $_lang)
+							{
+								?>
+								<a class="dropdown-item <?php echo (ACTIVE_LANG == $_lang_key) ? 'active' : ''; ?>"
+								   href="<?php echo __SITE_URL . '/' . __('debtor', 'url') . '/' . __('changeLanguage', 'url') . '/' . $_lang_key; ?>">
+									<?php echo $available_languages[$_lang_key]; ?>
+								</a>
+								<?php
+							}
+							?>
+							</div>
+						</div>
+						<?php
+					}
+				?>
+			</div>
+		</div>
+	</div>
+</header>

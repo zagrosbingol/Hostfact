@@ -1,0 +1,132 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Notificatie via het klantenpaneel</title>
+	<style type='text/css'>
+		<!--
+		body {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			color: #000000;
+		}
+		p {
+			font-size:1em;
+			font-family: 'Arial', 'Verdana', sans-serif;
+			line-height: 1.8em;
+		}
+		a, a:visited, a:active {
+			text-decoration: underline;
+			color: #1b5cce;
+		}
+
+		a:hover {
+			text-decoration: none;
+			color: #1b5cce;
+		}
+		-->
+	</style>
+</head>
+<body>
+
+<br />
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<td width="100%" align="center">
+
+			<table border="0" cellpadding="0" cellspacing="0" width="680">
+				<tr>
+					<td width="680" align="left">
+
+						<h2>Betaalgegevens van [debtor-&gt;DebtorCode] gewijzigd</h2>
+
+						<p style="line-height: 1.8em;">
+							Op <?php echo date('d-m-Y').' om '.date('H:i'); ?> heeft debiteur <a href="<?php echo BACKOFFICE_URL ?>debtors.php?page=edit&id=[debtor-&gt;Identifier]"><?php if($debtorOld->CompanyName != ''){ ?>[debtorOld-&gt;CompanyName]<?php }else{ ?>[debtorOld-&gt;Initials] [debtorOld-&gt;SurName]<?php } ?></a> betaalgegevens gewijzigd via het klantenpaneel.
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<td width="680" align="center">
+						<br />
+						<hr />
+						<table border="0" cellpadding="5" cellspacing="0" width="100%">
+							<tr>
+								<td></td>
+								<td><strong>Huidige gegevens</strong></td>
+								<td><strong>Gewijzigde gegevens</strong></td>
+							</tr>
+								<tr>
+									<td>Machtiging</td>
+									<td><?php global $array_mailingoptin; echo $array_mailingoptin[$debtorOld->InvoiceAuthorisation]; ?></td>
+									<td><?php if($debtorChanged->InvoiceAuthorisation != $debtorOld->InvoiceAuthorisation){ echo $array_mailingoptin[$debtorChanged->InvoiceAuthorisation]; } ?></td>
+								</tr>
+								<tr>
+									<td>Bankrekeningnummer</td>
+									<td><?php echo $debtorOld->AccountNumber; ?></td>
+									<td><?php if($debtorChanged->AccountNumber != $debtorOld->AccountNumber){ echo ($debtorChanged->AccountNumber) ? $debtorChanged->AccountNumber : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>Naam rekeninghouder</td>
+									<td><?php echo $debtorOld->AccountName; ?></td>
+									<td><?php if($debtorChanged->AccountName != $debtorOld->AccountName){ echo ($debtorChanged->AccountName) ? $debtorChanged->AccountName : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>Bank</td>
+									<td><?php echo $debtorOld->AccountBank; ?></td>
+									<td><?php if($debtorChanged->AccountBank != $debtorOld->AccountBank){ echo ($debtorChanged->AccountBank) ? $debtorChanged->AccountBank : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>Vestigingsplaats bank</td>
+									<td><?php echo $debtorOld->AccountCity; ?></td>
+									<td><?php if($debtorChanged->AccountCity != $debtorOld->AccountCity){ echo ($debtorChanged->AccountCity) ? $debtorChanged->AccountCity : '-'; } ?></td>
+								</tr>
+								<tr>
+									<td>BIC</td>
+									<td><?php echo $debtorOld->AccountBIC; ?></td>
+									<td><?php if($debtorChanged->AccountBIC != $debtorOld->AccountBIC){ echo ($debtorChanged->AccountBIC) ? $debtorChanged->AccountBIC : '-'; } ?></td>
+								</tr>
+						</table>
+
+						<hr />
+					</td>
+
+				</tr>
+				<tr>
+					<td width="680" align="left">
+
+						<br />
+
+						<h2>Wat moet ik doen om de wijziging te verwerken?</h2>
+						<?php if($debtorChanged->ClientareaProfileObject->Rights['CLIENTAREA_DEBTOR_PAYMENTDATA_CHANGE'] == 'approve'){ ?>
+							<p style="line-height: 1.8em;">U kunt via HostFact het verzoek tot wijziging goedkeuren, aanpassen of weigeren. Door op onderstaande link te klikken, komt u direct op de pagina van de debiteur uit.</p>
+						<?php }else{ ?>
+							<p style="line-height: 1.8em;">U hoeft geen actie te ondernemen, omdat u heeft ingesteld dat wijzigingen van persoonlijke gegevens zijn toegestaan. De wijziging is daarom al doorgevoerd en deze e-mail geldt enkel ter notificatie.</p>
+						<?php } ?>
+						<hr />
+
+						<p>
+							<a href="<?php echo BACKOFFICE_URL ?>debtors.php?page=edit&id=[debtor-&gt;Identifier]">Ga direct naar de debiteur in HostFact</a>
+						</p>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td width="680" align="center">
+
+						<br /><br />
+
+						<font style="color:#666666;font-size:0.8em">Dit is een automatisch verzonden e-mail vanuit uw HostFact</font>
+
+					</td>
+				</tr>
+			</table>
+
+		</td>
+	</tr>
+</table>
+
+<br /><br />
+
+</body>
+</html>

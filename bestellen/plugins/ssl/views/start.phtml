@@ -1,0 +1,79 @@
+<div class="o_form">
+
+	<br />
+
+	<?php
+	$this->set('progress_step','start');
+	$this->element('progress.phtml');
+	?>
+	
+	<?php
+	$this->element('errors.phtml');
+	?>
+	
+	<h2><?php echo __('ssl wizard title', 'ssl'); ?></h2>
+	<br />
+
+	<?php if($hasWildcard === true || $hasMultiDomain === true){ ?>
+		<strong><?php echo __('ssl wizard - one or more domains', 'ssl'); ?></strong><br />
+		<label class="no_width"><input name="wizard_one_or_more" value="one" type="radio" /> <?php echo __('ssl wizard - one or more domains - one', 'ssl'); ?></label><br />
+		<?php if($hasWildcard === true){ ?>
+		<label class="no_width"><input name="wizard_one_or_more" value="wildcard" type="radio" /> <?php echo __('ssl wizard - one or more domains - wildcard', 'ssl'); ?></label><br />
+		<?php } ?>
+		<?php if($hasMultiDomain === true){ ?>
+		<label class="no_width"><input name="wizard_one_or_more" value="multidomain" type="radio" /> <?php echo __('ssl wizard - one or more domains - multi', 'ssl'); ?></label><br />
+		<?php } ?>
+		<br />
+	<?php } ?>
+	
+	<?php if($hasExtended === true){ ?>
+	<div id="wizard_extended_div" <?php if($hasWildcard === true || $hasMultiDomain === true){ ?>style="display: none;"<?php } ?>>
+	
+		<strong><?php echo __('ssl wizard - extra validated', 'ssl'); ?></strong><br />
+		<label class="no_width"><input name="wizard_extended" value="yes" type="radio" /> <?php echo __('ssl wizard - extra validated - yes', 'ssl'); ?></label><br />
+		<label class="no_width"><input name="wizard_extended" value="no" type="radio" /> <?php echo __('ssl wizard - extra validated - no', 'ssl'); ?></label><br />
+		<br />
+	
+	</div>
+	<?php } ?>
+	
+	<div id="wizard_result_table" style="display: none;">
+
+	</div>
+</div>
+<script type="text/javascript">
+jQuery(document).ready(function(){
+	
+	jQuery('input[name="wizard_one_or_more"]').click(function(){
+		
+		if(jQuery('#wizard_extended_div').html() != undefined && jQuery('#wizard_extended_div:visible').html() == undefined)
+		{
+			jQuery('#wizard_extended_div').show();
+		}
+		else
+		{
+			getSSLWizardResults();
+		}
+	});
+	
+	jQuery('input[name="wizard_extended"]').click(function(){
+		getSSLWizardResults();
+	});
+	
+	if(jQuery('input[name="wizard_one_or_more"]').val() == undefined && jQuery('input[name="wizard_extended"]').val() == undefined)
+	{
+		getSSLWizardResults();
+	}
+	
+});
+
+function getSSLWizardResults()
+{
+	jQuery.post("?cart=<?php echo ORDERFORM_ID; ?>", { step: "get_ssl_wizard_results", wizard_one_or_more: jQuery('input[name="wizard_one_or_more"]:checked').val(), wizard_extended:  jQuery('input[name="wizard_extended"]:checked').val()},function(data){
+		jQuery('#wizard_result_table').html(data).show();
+		
+		// WordPress iframe wrapper
+		postIframeHeight();
+	},'html');
+}
+</script>

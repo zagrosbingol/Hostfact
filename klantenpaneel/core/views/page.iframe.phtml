@@ -1,0 +1,54 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+	<div class="main-content p-a-2">
+
+		<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+
+		if(isset($iframe_title))
+		{
+		/*	?><h1><?php echo $iframe_title; ?></h1><?php*/
+		}
+
+		if(isset($iframe_url) && $iframe_url)
+		{
+			?>
+			<iframe src="<?php echo $iframe_url  . '&lang=' . ACTIVE_LANG . '&iframe=clientarea'; ?>" frameborder="0" class="hf-orderform" scrolling="no"></iframe>
+			<?php
+		}
+		?>
+	</div>
+</div>
+<style type="text/css">
+	.hf-orderform {
+		width:100%;
+	}
+</style>
+<script type="text/javascript">
+	window.addEventListener("message", receiveMessage, false);
+	function receiveMessage(event){
+		if(event.data.substring(0,12) == 'iframe_click'){
+			jQuery('.hf-orderform').height((1* event.data.substring(13)));
+		}
+		else if(typeof event.data == 'string' && event.data == 'iframe_reload')
+		{
+			var scrollTo = Math.max(
+				jQuery('html').scrollTop(),
+				jQuery('body').scrollTop()
+			);
+
+			if(scrollTo > jQuery('.hf-orderform').offset().top)
+			{
+				jQuery('html, body').animate({scrollTop: jQuery('.hf-orderform').offset().top}, 100);
+			}
+		}
+	}
+</script>

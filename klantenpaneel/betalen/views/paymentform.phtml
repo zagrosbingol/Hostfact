@@ -1,0 +1,121 @@
+<h2><?php echo sprintf(__('pay invoice for company'), htmlspecialchars($company_data->CompanyName)); ?></h2>
+
+<form method="post" action="<?php echo $form_action; ?>" name="payment_form" id="payment_form">
+	<input type="hidden" name="start_payment" value="yes" />
+			
+	<div class="box">
+		<div>
+			<table cellspacing="0" cellpadding="1" border="0" width="100%">
+			<tr>
+				<td width="125"><?php echo __('invoice number'); ?>:</td>
+				<td><?php echo $payment_object->InvoiceCode; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('invoice date'); ?>:</td>
+				<td><?php echo $payment_object->Date; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('invoice amount'); ?>:</td>
+				<td><?php echo money($payment_object->AmountIncl);?></td>
+			</tr>
+			<?php
+			if(!($payment_object->AmountPaid === '' || $payment_object->AmountPaid == 0))
+			{ 
+				?>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td><?php echo __('invoice already paid'); ?>:</td>
+					<td><?php echo money($payment_object->AmountPaid); ?></td>
+				</tr>
+				<tr>
+					<td><?php echo __('invoice open amount'); ?>:</td>
+					<td><?php echo money($payment_object->AmountIncl - $payment_object->AmountPaid); ?></td>
+				</tr>
+				<?php 
+			} 
+			
+			if($payment_object->Authorisation == 'yes')
+			{ 
+				?>
+				<tr>
+					<td colspan="2" align="center"><br /><strong><?php echo __('invoice already authorized'); ?></strong></td>
+				</tr>
+				<?php 
+			} 
+			?>
+			</table>
+		</div>
+	</div>
+	<br />
+			
+	<p><?php echo __('choose from one of the following payment methods'); ?></p>
+			
+	<?php 
+	foreach($payment_method_list as $key => $method)
+	{
+		?>
+		<div class="box">
+			<table cellspacing="0" cellpadding="1" border="0">
+			<tr>
+				<td width="20">
+					<input type="radio" id="payment_method_<?php echo $key; ?>" name="payment_method" value="<?php echo $key; ?>" <?php if(isset($_POST['payment_method']) && $_POST['payment_method'] == $key){ echo "checked=\"checked\""; } ?>/>			
+				</td>
+				<td width="150" class="payment_method_image_column">
+					<?php 
+					if($method['IMAGE'])
+					{ 
+						?><label for="payment_method_<?php echo $key; ?>"><img src="<?php echo 'images/'.$method['IMAGE']; ?>" alt="<?php echo $method['IMAGEALT']; ?>"/></label><?php
+					}
+					elseif($method['IMAGEALT'])
+					{
+						?><label for="payment_method_<?php echo $key; ?>"><?php echo $method['IMAGEALT']; ?></label><?php
+					}
+					?>
+				</td>
+				<td><label for="payment_method_<?php echo $key; ?>"><?php echo $method['TITLE']; ?></label></td>
+			</tr>
+			<?php 
+			if(file_exists($method['DIRECTORY']."/payment_provider.php"))
+			{
+				// Load payment provider
+				include_once $method['DIRECTORY']."/payment_provider.php";
+				$tmp_payment_provider = new $method['CLASS'];				
+				
+				// Look for payment method choice
+				$choose_payment_method_html = $tmp_payment_provider->choosePaymentMethod(); 
+				
+				if($choose_payment_method_html)
+				{ 
+					?>
+					<tr class="payment_extra_tr" <?php if(!isset($_POST['payment_method']) || $_POST['payment_method'] != $key){ ?>style="display:none;"<?php } ?>>
+						<td>&nbsp;</td>
+						<td class="payment_method_image_column">&nbsp;</td>
+						<td><?php if($method['EXTRA']){ ?><strong><?php echo $method['EXTRA']; ?></strong> <?php } ?><?php echo $choose_payment_method_html; ?></td>
+					</tr>
+					<?php 
+				}
+			}
+			elseif(file_exists($method['DIRECTORY']."/DirReq.php"))
+			{ 
+				?>
+				<tr class="payment_extra_tr" <?php if(!isset($_POST['payment_method']) || $_POST['payment_method'] != $key){ ?>style="display:none;"<?php } ?>>
+					<td>&nbsp;</td>
+					<td class="payment_method_image_column">&nbsp;</td>
+					<td><?php if($method['EXTRA']){ ?><strong><?php echo $method['EXTRA']; ?></strong> <?php } ?><?php include_once $method['DIRECTORY']."/DirReq.php"; ?></td>
+				</tr>
+				<?php 
+			} 
+			?>
+			</table>
+		</div>
+		<?php
+	}
+	?>
+			
+	<div class="noborder_box align_right">
+		<button id="submit_btn" class="button_submit"><?php echo __('button pay'); ?></button>
+	</div>
+			
+</form>	

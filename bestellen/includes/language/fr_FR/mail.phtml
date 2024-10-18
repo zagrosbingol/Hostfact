@@ -1,0 +1,245 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Mail de confirmation de commande</title>
+<style type='text/css'>
+<!--
+body {
+    font-size:1em;
+	font-family: 'Arial', 'Verdana', sans-serif;
+    color: #000000;
+}
+h3 {
+	margin:0.2em 0em 0.2em 0em;
+}
+p {
+	font-size:1em;
+	font-family: 'Arial', 'Verdana', sans-serif;
+	line-height: 1.6em;
+}
+a, a:visited, a:active {
+	text-decoration: underline;
+	color: #1b5cce;
+}
+
+a:hover {
+	text-decoration: none;
+	color: #1b5cce;
+}
+table tr td{
+	padding:0.2em 0em 0.2em 0em;
+}
+-->
+</style>
+</head>
+<body>
+
+<br />
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<td width="100%" align="center">
+		
+			<table border="0" cellpadding="0" cellspacing="0" width="680">
+				<tr>
+					<td width="680" align="left">
+						
+						<h2>Merci pour votre commande!</h2>
+						
+						<p style="line-height: 1.6em;">
+							Nous avons bien reçu votre commande et nous allons la traiter aussi vite que possible. Veuillez en trouver ci-dessous le récapitulatif.<br />					
+							<br />
+							Si vous avez des questions, n'hésitez pas à nous contacter.<br />
+							<br />
+							Cordialement,<br />
+							<?php echo COMPANY_NAME; ?>
+						</p>
+						
+						<br />
+						
+						<h3>Détails de votre commande</h3>
+						
+						<table width="100%" cellpadding="0" cellspacing="0">
+							<?php 
+							foreach($order['elements'] as $k=>$element){
+								// Compact view (for discount and transaction costs)
+								if(isset($element['isCompactView']) && $element['isCompactView'] == true)
+								{
+									?>
+									<tr>
+										<?php if($order['highestElementNumber'] > 1){ ?><td>&nbsp;</td><?php } ?>
+										<td valign="top"><?php echo nl2br($element['Description']); ?><br /></td>
+										<td>&nbsp;</td>
+										<td width="30" align="right" valign="top"><?php echo w_currency('left'); ?></td>
+										<td width="70" align="right" valign="top"><?php echo w_money((SHOW_VAT_INCLUDED) ? $element['AmountIncl'] : $element['AmountExcl'], 'right'); ?></td>
+									</tr>
+									<?php 
+								}
+								// Only description
+								elseif(($element['PriceExcl'] === '' || $element['PriceExcl'] == 0) && !$element['ProductCode'])
+								{
+									?>
+									<tr>
+										<?php if($order['highestElementNumber'] > 1){ ?><td>&nbsp;</td><?php } ?>
+										<td valign="top"><?php echo nl2br($element['Description']); ?><br /></td>
+										<td colspan="3">&nbsp;</td>
+									</tr>
+									<?php 
+									
+								}
+								else
+								{ 
+									?>
+									<tr>
+										<?php if($order['highestElementNumber'] > 1){ ?><td width="60" valign="top"><?php echo $element['Number']; ?>x</td><?php } ?>
+										<td valign="top"><?php echo nl2br($element['Description']); ?></td>
+										<td width="70" valign="top"><?php echo w_period($element['Periods'], $element['Periodic']); ?></td>
+										<td width="30" align="right" valign="top"><?php echo w_currency('left'); ?></td>
+										<td width="70" align="right" valign="top"><?php echo w_money((SHOW_VAT_INCLUDED) ? $element['AmountIncl'] : $element['AmountExcl'], 'right'); ?></td>
+									</tr>
+									<?php 
+								}
+								
+								// If element has discount percentage
+								if($element['DiscountPercentage'] > 0)
+								{
+									?>
+									<tr>
+										<?php if($order['highestElementNumber'] > 1){ ?><td>&nbsp;</td><?php } ?>
+										<td valign="top"><?php echo $element['DiscountDescription']; ?></td>
+										<td>&nbsp;</td>
+										<td width="30" align="right" valign="top"><?php echo w_currency('left'); ?></td>
+										<td width="90" align="right" valign="top"><?php echo w_money((SHOW_VAT_INCLUDED) ? $element['DiscountAmountIncl'] : $element['DiscountAmountExcl'], 'right'); ?></td>
+									</tr>
+									<?php 
+								}
+							
+							} 
+							
+							?>
+							<tr>
+								<td colspan="<?php echo ($order['highestElementNumber'] > 1) ? '5' : '4'; ?>">&nbsp;</td>
+							</tr>
+							<?php if(isset($order['Discount']) && $order['Discount'] > 0){ ?>
+							<tr>
+								<td colspan="<?php echo ($order['highestElementNumber'] > 1) ? '3' : '2'; ?>" align="right" valign="top"><?php echo $order['Discount']; ?>% remise:</td>
+								<td align="right" valign="top"><?php echo w_currency('left'); ?></td>
+								<td align="right" valign="top"><?php echo w_money((SHOW_VAT_INCLUDED) ? $order['DiscountAmountIncl'] : $order['DiscountAmountExcl'], 'right'); ?></td>
+							</tr>
+							<?php } ?>
+							<?php if(count($array_taxpercentages) > 0 || count($array_total_taxpercentages) > 0){ ?>
+							<tr>
+								<td colspan="<?php echo ($order['highestElementNumber'] > 1) ? '3' : '2'; ?>" align="right" valign="top">Total HT:</td>
+								<td align="right" valign="top"><?php echo w_currency('left'); ?></td>
+								<td align="right" valign="top"><?php echo w_money($order['AmountExcl'], 'right'); ?></td>
+							</tr>
+							<?php } ?>
+							<?php
+							asort($array_taxpercentages); 
+							foreach($array_taxpercentages as $key=>$value)
+							{
+								if(isset($order['UsedTaxRates'][(string)(float)$key]['AmountTax']))
+								{
+									?>
+									<tr>
+										<td colspan="<?php echo ($order['highestElementNumber'] > 1) ? '3' : '2'; ?>" align="right" valign="top"><?php echo (isset($array_taxpercentages_info[(string)(float)$key]['label'])) ? $array_taxpercentages_info[(string)(float)$key]['label'] : ''; ?>:</td>
+										<td align="right" valign="top"><?php echo w_currency('left'); ?></td>
+										<td align="right" valign="top"><?php echo w_money($order['UsedTaxRates'][(string)(float)$key]['AmountTax'], 'right'); ?></td>
+									</tr>
+									<?php
+								}
+							}
+							
+							if(isset($order['TaxRateLabel']) && $order['TaxRateLabel'])
+							{
+								?>
+								<tr>
+									<td colspan="<?php echo ($order['highestElementNumber'] > 1) ? '3' : '2'; ?>" align="right" valign="top"><?php echo $order['TaxRateLabel']; ?>:</td>
+									<td align="right" valign="top"><?php echo w_currency('left'); ?></td>
+									<td align="right" valign="top"><?php echo w_money($order['TaxRateAmount'], 'right'); ?></td>
+								</tr>
+								<?php
+							}
+							?>
+							<tr>
+								<td colspan="<?php echo ($order['highestElementNumber'] > 1) ? '3' : '2'; ?>" align="right" valign="top"><strong>Total TTC:</strong></td>
+								<td align="right" valign="top"><strong><?php echo w_currency('left'); ?></strong></td>
+								<td align="right" valign="top"><strong><?php echo w_money($order['AmountIncl'], 'right'); ?></strong></td>
+							</tr>
+						</table>
+						<br />
+						
+						<h3>Vous concernant</h3>
+						
+						<?php $col_width = ($customer_data['CustomInvoiceAddress'] == 'yes') ? 33 : 50;	?>
+						
+						<table width="100%" cellpadding="0" cellspacing="0">
+							<tr>
+								<td width="<?php echo $col_width; ?>%" valign="top"><p style="line-height: 1.4em;">
+									<strong>Informations Client:</strong><br />
+									
+									<?php if($customer_data['CompanyName']){ echo $customer_data['CompanyName']."<br />"; } ?>
+									<?php echo \Setting_Model::getGenderTranslation($customer_data['Sex']) . ' ' . $customer_data['Initials'].' '.$customer_data['SurName']; ?><br />
+									<?php echo $customer_data['Address']; ?><br />
+									<?php echo $customer_data['ZipCode']; ?> <?php echo $customer_data['City']; ?><br />
+									<?php echo $array_country[$customer_data['Country']]; ?><br />
+									<br />
+									<?php if($customer_data['PhoneNumber']){ echo "T: " . $customer_data['PhoneNumber']."<br />"; } ?>
+									<?php if($customer_data['EmailAddress']){ echo "E: " . check_email_address($customer_data['EmailAddress'], 'convert', ', ') . "<br />"; } ?>
+								</p></td>
+								<?php if($customer_data['CustomInvoiceAddress'] == 'yes'){ ?>
+								<td width="<?php echo $col_width; ?>%" valign="top"><p style="line-height: 1.4em;">
+									<strong>Adresse de facturation:</strong><br />
+									
+									<?php 
+									if(isset($customer_data['InvoiceCompanyName']) && $customer_data['InvoiceCompanyName'])
+									{
+										echo $customer_data['InvoiceCompanyName']."<br />";
+									}
+									?>
+									
+									<?php echo \Setting_Model::getGenderTranslation($customer_data['InvoiceSex']) . ' ' . $customer_data['InvoiceInitials'].' '.$customer_data['InvoiceSurName']; ?><br />
+									<?php echo $customer_data['InvoiceAddress']; ?><br />
+									<?php echo $customer_data['InvoiceZipCode']; ?> <?php echo $customer_data['InvoiceCity']; ?><br />
+									<?php echo $array_country[$customer_data['InvoiceCountry']]; ?><br />
+									<br />
+									<?php if($customer_data['InvoiceEmailAddress']){ echo "E: " . check_email_address($customer_data['InvoiceEmailAddress'], 'convert', ', ') . "<br />"; } ?>
+								</p></td>
+								<?php } ?>
+								<?php if(isset($order['PaymentMethod']) && $order['PaymentMethod'] != '' && $order['AmountIncl'] > 0){ ?>
+								<td width="<?php echo $col_width; ?>%" valign="top"><p style="line-height: 1.4em;">
+									<strong>Moyen de paiement</strong><br />
+									<?php echo $array_paymentmethods[$order['PaymentMethod']]['Title']; ?><br />
+									<?php if($order['PaymentMethod'] == 'auth'){ ?>
+										<?php if(isset($order['AccountNumber']) && $order['AccountNumber']){ echo $order['AccountNumber']; } ?><br />
+										<?php if(isset($order['AccountBIC']) && $order['AccountBIC']){ echo $order['AccountBIC']; } ?><br />
+										<?php if(isset($order['AccountName']) && $order['AccountName']){ echo $order['AccountName']; } ?><br />
+										<?php if(isset($order['AccountCity']) && $order['AccountCity']){ echo $order['AccountCity']; } ?><br />
+									<?php } ?>
+								</p></td>
+								<?php } ?>
+							</tr>
+						</table>
+						
+						
+						<?php if(isset($order['Comment']) && $order['Comment']){ ?>
+							<br /><br />
+							
+							<h3>Commentaires</h3>
+							
+							<p style="line-height: 1.6em;">
+								<?php echo nl2br($order['Comment']); ?>
+							</p>
+						<?php } ?>
+					</td>
+				</tr>
+			</table>
+		
+		</td>
+	</tr>
+</table>
+
+<br /><br />
+
+</body>
+</html>

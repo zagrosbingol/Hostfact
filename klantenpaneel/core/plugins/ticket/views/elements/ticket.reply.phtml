@@ -1,0 +1,35 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<h2><?php echo __('new reply message'); ?></h2>
+
+<div id="ticket-reply" class="p-a-0">
+	<form id="form-ticket-reply" method="post" action="<?php echo  __SITE_URL . '/' . __('ticket', 'url') . '/' . __('view', 'url') . '/' . $ticket->id; ?>"enctype="multipart/form-data">
+
+		<hr />
+
+		<div class="form-group">
+			<textarea class="form-control autogrow height1" name="Message"><?php if(isset($ticketmessage->Message)){ echo normalize($ticketmessage->Message); } ?></textarea>
+		</div>
+
+		<a href="#" data-event="add-attachment"><span class="fas fa-plus"></span> <?php echo __('add attachment'); ?></a>
+
+		<div class="pull-xs-right">
+			<button type="submit" class="btn btn-primary"><?php echo __('post reply'); ?></button>
+		</div>
+
+		<br />
+
+	</form>
+
+	<?php if(isset($ticketmessage->ErrorFields)){ validate_input($ticketmessage->ErrorFields); } ?>
+
+</div>
+<br />
+
+<?php
+$this->showElement('ticket.js');
+?>

@@ -1,0 +1,19 @@
+.interactioninfo_sidebar{
+	display:block;	
+}
+#interaction_divider{
+	display:block;
+}
+.debtorinfo_inline{
+	display:block !important;	
+}
+#buttonbar_show_debtor #more_info, #buttonbar_show_debtor #less_info{
+	display: none !important;	
+}
+
+.widget{ width:309px; }
+.show_col_ws { display: none; }
+	
+.tr_invoiceelement .input_date img.ui-datepicker-trigger { display:block; margin-top: 6px;}
+.tr_invoiceelement .input_date input.hasDatepicker { display:none;}
+.invoicetable.alt1 tr:first-child th:nth-child(8) {-moz-border-radius-topright:5px;-webkit-border-top-right-radius:5px;border-top-right-radius:5px}	

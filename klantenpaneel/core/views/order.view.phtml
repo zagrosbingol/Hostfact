@@ -1,0 +1,257 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2" >
+
+	<?php if(isset($message)){ echo $message; } ?>
+
+	<h1><?php echo __('order') . ' ' . normalize($order_object->OrderCode); ?></h1>
+
+	<div class="row">
+
+		<div class="col-md-6 col-sm-12 m-b-2">
+			<?php echo show_client_address($order_object); ?>
+		</div>
+
+		<div class="col-md-6 col-sm-12 m-b-2">
+
+			<dl class="dl-horizontal">
+				<dt class="col-sm-4"><?php echo __('order date'); ?></dt>
+				<dd class="col-sm-8"><?php echo rewrite_date_db2site($order_object->Date) . ' '.__('at').' '. rewrite_date_db2site($order_object->Date, 'H:i'); ?></dd>
+				<dt class="col-sm-4"><?php echo __('status'); ?></dt>
+				<dd class="col-sm-8"><?php echo __($order_object->Status, 'array_orderstatus'); ?></dd>
+			</dl>
+		</div>
+
+	</div>
+
+	<?php
+		if($order_object->Comment)
+		{
+			?>
+			<div class="m-b-3">
+				<?php
+				echo '<strong>' . __('comment') . '</strong><br />';
+					echo nl2br(normalize($order_object->Comment));
+				?>
+			</div>
+			<?php
+		}
+	?>
+
+	<h2 class="hidden-sm-up"><?php echo __('order lines'); ?></h2>
+
+	<div class="row small-gutter strong hidden-xs-down">
+		<div class="col-sm-2 col-md-1"><?php echo __('quantity') ?></div>
+		<div class="col-sm-6 col-md-8"><?php echo __('description') ?></div>
+		<div class="col-sm-4 col-md-3 text-xs-right"><?php echo ($order_object->VatCalcMethod == 'incl') ? __('amountIncl') : __('amountExcl'); ?></div>
+	</div>
+
+	<hr />
+
+	<?php
+
+	if(!empty($order_object->OrderLines))
+	{
+		foreach($order_object->OrderLines as $k => $v)
+		{
+			if(is_numeric($k))
+			{
+				/** ORDER LINE */
+				?>
+				<div class="row small-gutter m-t-1">
+
+					<div class="col-sm-2 col-md-1 hidden-xs-down">
+						<?php
+						if(!($v['PriceExcl'] === '' || $v['PriceExcl'] == 0) || $v['ProductCode'])
+						{
+							echo showNumber($v['Number']);
+						}
+						?>
+					</div>
+
+					<div class="col-sm-7 col-md-9 col-xs-8">
+						<?php
+						if($v['Number'] != 1)
+						{
+							// only show amount on mobile if it is not one
+							echo '<span class="hidden-sm-up">' . showNumber($v['Number']) . ' x &nbsp;</span>';
+						}
+
+						echo (trim($v['Description'])) ? nl2br(parseHTMLTags(normalize($v['Description']))) : '&nbsp;';
+
+						if((!($v['PriceExcl'] === '' || $v['PriceExcl'] == 0) || $v['ProductCode']) && $v['Periodic'] != '')
+						{
+							echo '<br/><i>';
+							echo '<span class="hidden-sm-down">' . $v['Periods'] . ' ' . __($v['Periodic'], (($v['Periods'] > 1) ? 'array_periodic_multi' : 'array_periodic')) . '</span>';
+							echo '</i>';
+						}
+						?>
+					</div>
+
+					<div class="col-sm-3 col-md-2 col-xs-4">
+						<?php
+						if(!($v['PriceExcl'] === '' || $v['PriceExcl'] == 0) || $v['ProductCode'])
+						{
+							?>
+							<div class="row small-gutter">
+								<div class="col-xs-2 hidden-xs-down">
+									<?php echo Settings_Model::get('CURRENCY_SIGN_LEFT'); ?>
+								</div>
+								<div class="col-xs-10 text-xs-right text-nowrap">
+									<span class="hidden-sm-up">
+										<?php
+										echo Settings_Model::get('CURRENCY_SIGN_LEFT') . ' ';
+										?>
+									</span>
+									<?php
+									echo money(($order_object->VatCalcMethod == 'incl') ? $v['NoDiscountAmountIncl'] : $v['NoDiscountAmountExcl'], FALSE);
+									if(Settings_Model::get('CURRENCY_SIGN_RIGHT'))
+									{
+										echo ' ' . Settings_Model::get('CURRENCY_SIGN_RIGHT');
+									}
+									?>
+								</div>
+							</div>
+
+							<?php
+						}
+						?>
+					</div>
+				</div>
+
+				<?php
+				/** DISCOUNT LINE */
+				if($v['DiscountPercentage'] > 0)
+				{
+					?>
+					<div class="row small-gutter m-t-0">
+
+						<div class="col-sm-2 col-md-1 hidden-xs-down">&nbsp;</div>
+
+						<div class="col-sm-7 col-md-9 col-xs-8">
+							<i><?php echo sprintf(__('discount on product'), showNumber(round($v['DiscountPercentage'], 2)) . '%'); ?></i>
+						</div>
+
+						<div class="col-sm-3 col-md-2 col-xs-4">
+							<div class="row small-gutter">
+								<div class="col-xs-2 hidden-xs-down">
+									<?php echo Settings_Model::get('CURRENCY_SIGN_LEFT'); ?>
+								</div>
+								<div class="col-xs-10 text-xs-right text-nowrap">
+									<span class="hidden-sm-up">
+										<?php
+										echo Settings_Model::get('CURRENCY_SIGN_LEFT') . ' ';
+										?>
+									</span>
+									<?php
+									echo money(($order_object->VatCalcMethod == 'incl') ? $v['DiscountAmountIncl'] : $v['DiscountAmountExcl'], FALSE);
+									if(Settings_Model::get('CURRENCY_SIGN_RIGHT'))
+									{
+										echo ' ' . Settings_Model::get('CURRENCY_SIGN_RIGHT');
+									}
+									?>
+								</div>
+							</div>
+						</div>
+					</div>
+					<?php
+				}
+
+				// dont show line on last invoice line
+				if(count($order_object->OrderLines) < $key--)
+				{
+					?>
+					<hr class="hidden-sm-up" />
+					<?php
+				}
+			}
+		}
+
+		if($order_object->Discount > 0)
+		{
+			?>
+			<div class="row small-gutter m-t-2">
+				<div class="col-sm-2 col-md-3 hidden-xs-down">&nbsp;</div>
+
+				<div class="col-sm-7 col-xs-8">
+					<?php
+					echo sprintf(__('discount on invoice'), showNumber($order_object->Discount) . '%');
+					?>
+				</div>
+
+				<div class="col-sm-3 col-md-2 col-xs-4">
+					<div class="row small-gutter">
+						<div class="col-xs-2 hidden-xs-down">
+							<?php echo Settings_Model::get('CURRENCY_SIGN_LEFT'); ?>
+						</div>
+						<div class="col-xs-10 text-xs-right text-nowrap">
+							<span class="hidden-sm-up">
+								<?php
+								echo Settings_Model::get('CURRENCY_SIGN_LEFT') . ' ';
+								?>
+							</span>
+							<?php
+							echo money(($order_object->VatCalcMethod == 'incl') ? $order_object->AmountDiscountIncl : $order_object->AmountDiscount, FALSE);
+							if(Settings_Model::get('CURRENCY_SIGN_RIGHT'))
+							{
+								echo ' ' . Settings_Model::get('CURRENCY_SIGN_RIGHT');
+							}
+							?>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<?php
+		}
+		?>
+		<div class="row small-gutter m-t-1">
+			<div class="col-xs-7 col-sm-9 col-md-10"></div>
+			<div class="col-xs-5 col-sm-3 col-md-2">
+				<hr />
+			</div>
+		</div>
+
+		<?php
+		if(!empty(Settings_Model::$taxpercentages) || !empty(Settings_Model::$total_taxpercentages))
+		{
+			echo generate_amount_totals(__('amountExcl'), money($order_object->AmountExcl, FALSE));
+		}
+
+		asort(Settings_Model::$taxpercentages);
+
+		foreach(Settings_Model::$taxpercentages as $key => $value)
+		{
+			if(isset($order_object->UsedTaxrates[(string)(float)$key]['AmountTax']) && (float)$key > 0)
+			{
+				$tax_label = (isset(Settings_Model::$taxpercentages_info[(string)(float)$key]['label'])) ? Settings_Model::$taxpercentages_info[(string)(float)$key]['label'] : '';
+				echo generate_amount_totals(normalize($tax_label), money($order_object->UsedTaxrates[(string)(float)$key]['AmountTax'], FALSE));
+			}
+		}
+
+		if(isset($order_object->TaxRate_Label) && $order_object->TaxRate_Label)
+		{
+			echo generate_amount_totals(normalize($order_object->TaxRate_Label), money($order_object->TaxRate_Amount, FALSE));
+		}
+
+
+		if(empty(Settings_Model::$taxpercentages) && empty($array_total_taxpercentages))
+		{
+			$total_label = '<strong>' . __('amount') . '</strong>';
+		}
+		else
+		{
+			$total_label = '<strong>' . __('amountIncl') . '</strong>';
+		}
+		echo generate_amount_totals($total_label, money($order_object->AmountIncl, FALSE));
+
+	}
+	?>
+
+</div>
+</div>

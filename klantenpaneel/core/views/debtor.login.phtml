@@ -1,0 +1,65 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-lg-9">
+
+	<div class="main-content p-a-2">
+
+		<?php if(isset($message)){ echo $message; } ?>
+
+		<h1><?php echo __('change password'); ?></h1>
+
+		<?php
+		if(isset($debtor->SurName))
+		{
+			?>
+
+			<form id="form-login-data" class="m-t-2" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('debtor', 'url'); ?>/<?php echo __('loginData', 'url'); ?>">
+
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label"><?php echo __('username'); ?></label>
+					<div class="col-sm-8">
+						<p class="form-control-static"><?php echo normalize($debtor->Username); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label"><?php echo __('current password'); ?></label>
+					<div class="col-sm-6">
+						<input class="form-control" type="password" name="CurrentPassword" value="" autocomplete="off">
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label"><?php echo __('new password'); ?></label>
+					<div class="col-sm-6">
+						<input class="form-control" type="password" name="NewPassword" value="" autocomplete="off">
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<label class="col-sm-3 form-control-label"><?php echo __('repeat password'); ?></label>
+					<div class="col-sm-6">
+						<input class="form-control" type="password" name="NewPasswordRepeat" value="" autocomplete="off">
+					</div>
+				</div>
+
+				<div class="form-group row">
+					<div class="offset-sm-2 col-sm-10 m-t-1">
+						<button type="submit" class="btn btn-primary pull-xs-right"><?php echo __('save data'); ?></button>
+					</div>
+				</div>
+
+			</form>
+
+			<?php
+		}
+		?>
+
+	</div>
+</div>
+
+<?php validate_input($debtor->ErrorFields); ?>

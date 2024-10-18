@@ -1,0 +1,46 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?><!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Required meta tags always come first -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+	<title><?php echo (Settings_Model::get('CLIENTAREA_HEADER_TITLE')) ? normalize(Settings_Model::get('CLIENTAREA_HEADER_TITLE')) : __('client area'); ?></title>
+
+<?php // load all base css files, this calls an url which will get the css files and output their content ?>
+	<link rel="stylesheet" href="<?php echo __SITE_URL . '/asset/css'; ?>">
+<?php // this will autoload css files from the custom/assets/css folder ?>
+	<?php echo load_custom_assets('css'); ?>
+
+<?php // load all base js files, this calls an url which will get the js files and output their content ?>
+	<script src="<?php echo __SITE_URL . '/asset/js'; ?>"></script>
+<?php // this will autoload js files from the custom/assets/js folder ?>
+	<?php echo load_custom_assets('js'); ?>
+
+</head>
+
+<body>
+
+
+<div class="login-table container-fluid">
+
+	<div class="login-table-cell">
+
+		<div class="login-box">
+
+<?php
+if(Settings_Model::get('CLIENTAREA_LOGO_URL'))
+{
+	echo '<img src="' . Settings_Model::get('CLIENTAREA_LOGO_URL') . '" class="center-block img-fluid" />';
+}
+else
+{
+	echo '<h1>' . normalize(Settings_Model::get('CLIENTAREA_HEADER_TITLE')) . '</h1>';
+}
+?>

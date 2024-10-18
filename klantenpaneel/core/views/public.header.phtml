@@ -1,0 +1,79 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Required meta tags always come first -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+
+	<title><?php echo (Settings_Model::get('CLIENTAREA_HEADER_TITLE')) ? normalize(Settings_Model::get('CLIENTAREA_HEADER_TITLE')) : normalize($company->CompanyName); ?></title>
+
+	<?php // load all base css files, this calls an url which will get the css files and output their content ?>
+	<link rel="stylesheet" href="<?php echo __SITE_URL . '/asset/css'; ?>">
+	<?php // this will autoload css files from the custom/assets/css folder ?>
+	<?php echo load_custom_assets('css'); ?>
+
+	<?php // load all base js files, this calls an url which will get the js files and output their content ?>
+	<script src="<?php echo __SITE_URL . '/asset/js'; ?>"></script>
+	<?php // this will autoload js files from the custom/assets/js folder ?>
+	<?php echo load_custom_assets('js'); ?>
+</head>
+
+<body>
+
+<header class="container-fluid p-t-1 p-b-1 bg-white">
+	<div class="container header-container">
+		<div class="row">
+
+			<div class="col-md-8 col-xs-12">
+				<?php
+				if(Settings_Model::get('CLIENTAREA_LOGO_URL'))
+				{
+					echo '<a href="' . __SITE_URL . '"><img src="' . Settings_Model::get('CLIENTAREA_LOGO_URL') . '" class="header-logo" /></a>';
+				}
+				elseif(Settings_Model::get('CLIENTAREA_HEADER_TITLE'))
+				{
+					echo '<div class="header-title">' . Settings_Model::get('CLIENTAREA_HEADER_TITLE') . '</div>';
+				}
+				?>
+
+			</div>
+
+			<div class="col-md-4 col-xs-12 profile-menu small-margin-top">
+
+
+				<br class="hidden-sm-down" />
+
+				<a href="<?php echo __SITE_URL . '/' . __('login', 'url') ;?>" class="pull-md-right pull-xs-left logout-link">
+					<?php echo __('login'); ?>
+				</a>
+			</div>
+		</div>
+	</div>
+</header>
+
+<div class="container-fluid bg-primary p-a-0 nav-container">
+	<div class="container p-a-0">
+
+		<nav class="navbar navbar-dark">
+
+			<div class="collapse navbar-toggleable-sm" id="mainMenuNav">
+				<ul class="nav navbar-nav">
+					<li class="nav-item dropdown"><a class="nav-link">&nbsp;</a></li>
+
+				</ul>
+			</div>
+
+		</nav>
+
+	</div>
+</div>
+
+<section class="container m-t-2 m-b-3">
+	<div class="row">

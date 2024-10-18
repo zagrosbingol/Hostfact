@@ -1,0 +1,69 @@
+<h2><?php echo __('payment pending'); ?></h2>
+
+<?php 
+if(isset($payment_object) && isset($payment_object->InvoiceCode))
+{ 
+	?><p><?php echo sprintf(__('payment for invoice is pending'), $payment_object->InvoiceCode); ?></p><?php 
+}
+elseif(isset($payment_object) && isset($payment_object->OrderCode))
+{ 
+	?><p><?php echo sprintf(__('payment for order is pending'), $payment_object->OrderCode); ?></p><?php 
+} 
+?>
+<br /><br />
+
+<strong><?php echo __('payment details'); ?></strong></p>
+
+<div class="box">
+		<table cellspacing="0" cellpadding="1" border="0">
+		<?php 
+		if(isset($payment_object) && isset($payment_object->InvoiceCode))
+		{ 
+			?>
+			<tr>
+				<td width="150"><?php echo __('invoice number'); ?>:</td>
+				<td><?php echo $payment_object->InvoiceCode; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('invoice date'); ?>:</td>
+				<td><?php echo $payment_object->Date; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('invoice amount'); ?>:</td>
+				<td><?php echo money($payment_object->AmountIncl); ?></td>
+			</tr>
+			<?php 
+		}
+		elseif(isset($payment_object) && isset($payment_object->OrderCode))
+		{ 
+			?>	
+			<tr>
+				<td width="150"><?php echo __('order number'); ?>:</td>
+				<td><?php echo $payment_object->OrderCode; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('order date'); ?>:</td>
+				<td><?php echo $payment_object->Date; ?></td>
+			</tr>
+			<tr>
+				<td><?php echo __('order amount'); ?>:</td>
+				<td><?php echo money($payment_object->AmountIncl); ?></td>
+			</tr>	
+			<?php 
+		} 
+		?>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		<tr>
+			<td><?php echo __('payment via'); ?>:</td>
+			<td><?php echo $paymentmethod; ?></td>
+		</tr>
+		<?php if($transactionid){ ?>
+		<tr>
+			<td><?php echo __('payment transactionid'); ?>:</td>
+			<td><?php echo $transactionid; ?></td>
+		</tr>
+		<?php } ?>
+		</table>
+</div>

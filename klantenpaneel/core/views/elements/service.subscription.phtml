@@ -1,0 +1,96 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+
+if(!empty($service->Subscription))
+{
+	?>
+	<div class="row">
+
+	<div class="col-md-9 col-sm-12">
+
+		<dl class="dl-horizontal m-b-0">
+
+			<?php
+				if($service->Subscription['Periodic'])
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('subscription'); ?></dt>
+					<dd class="col-sm-8">
+						<?php echo rewrite_date_db2site($service->Subscription['StartCurrent']); ?>
+						<?php echo __('till')?>
+						<?php echo rewrite_date_db2site($service->Subscription['EndCurrent']); ?>
+						(<?php echo $service->Subscription['Periods']; ?> <?php echo __($service->Subscription['Periodic'], 'array_periodic'); ?>)
+					</dd>
+					<?php
+				}
+			?>
+
+			<?php
+				if($service->Subscription['Number'] != 1 || $service->Subscription['NumberSuffix'])
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('quantity'); ?></dt>
+					<dd class="col-sm-8">
+						<?php
+						if(isset($service->Subscription['Number']) && isset($service->Subscription['NumberSuffix']))
+						{
+							$suffix = ($service->Subscription['NumberSuffix']) ? normalize($service->Subscription['NumberSuffix']) : '';
+							echo showNumber($service->Subscription['Number']) . $suffix;
+						}
+						?>
+					</dd>
+					<?php
+				}
+			?>
+
+			<dt class="col-sm-4"><?php echo __('total amount'); ?></dt>
+			<dd class="col-sm-8">
+				<?php
+					if(Settings_Model::get('SHOW_AMOUNT_VAT') == 'incl')
+					{
+						echo money($service->Subscription['AmountIncl']);
+						echo (isset($service->Subscription['TaxPercentage']) && $service->Subscription['TaxPercentage'] > 0) ? sprintf(' ' . __('tax included'), $service->Subscription['TaxPercentage']) : '';
+					}
+					else
+					{
+						echo money($service->Subscription['AmountExcl']);
+						echo (isset($service->Subscription['TaxPercentage']) && $service->Subscription['TaxPercentage'] > 0) ? sprintf(' ' . __('tax excluded'), $service->Subscription['TaxPercentage']) : '';
+					}
+				?>
+			</dd>
+
+		</dl>
+
+	</div>
+	</div>
+
+	<?php
+}
+
+if(isset($service) && in_array(Settings_Model::get('CLIENTAREA_SERVICE_TERMINATE'), array('yes', 'approve'), TRUE))
+{
+	// show terminate button (on mobile only)
+	if(!isset($service->Termination))
+	{
+		?>
+		<div class="row hidden-sm-up">
+			<div class="col-md-9 col-sm-12">
+
+				<dl class="dl-horizontal m-t-0">
+					<dt class="col-sm-4"></dt>
+					<dd class="col-sm-8">
+						<a href="" data-toggle="modal" data-target="#terminate-subscription" data-backdrop="static">
+							<?php echo __('terminate subscription'); ?>
+						</a>
+					</dd>
+				</dl>
+
+			</div>
+		</div>
+		<?php
+	}
+}
+?>

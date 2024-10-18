@@ -1,0 +1,193 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2">
+
+	<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+
+		$this->showElement('service.terminate');
+		$this->showElement('hosting.changepassword');
+	?>
+
+	<h1><?php echo __('hostingaccount') . ' ' . normalize($service->Username); ?></h1>
+
+	<?php
+		show_termination_warning($service);
+	?>
+
+	<div class="row m-t-1">
+		<div class="col-sm-12">
+
+			<?php
+			/** ACTION BUTTONS */
+
+			// only show buttons for active hosting accounts
+			if($service->Status == 4 && isset($service->ServerInfo['SSOSupport']) && $service->ServerInfo['SSOSupport'])
+			{
+				if(Settings_Model::get('CLIENTAREA_HOSTING_SINGLE_SIGN_ON') == 'yes')
+				{
+					?>
+					<a class="btn btn-secondary action-btn m-r no-disable" target="_blank" href="<?php echo __SITE_URL . '/' . __('hosting', 'url') . '/' . __('serverLogin', 'url') . '/' . $service->id; ?>">
+						<span class="fas fa-sign-in-alt fa-2x"></span>
+						<br/>
+						<div><?php echo __('login control panel'); ?></div>
+					</a>
+					<?php
+				}
+			}
+
+			if($service->Status == 4 && Settings_Model::get('CLIENTAREA_HOSTING_PASSWORD_RESET') == 'yes')
+			{
+				?>
+				<a class="btn btn-secondary action-btn m-r no-disable" data-toggle="modal" data-target="#service-change-password" data-backdrop="static">
+					<span class="fas fa-key fa-2x"></span>
+					<br/>
+					<div><?php echo __('change password control panel'); ?></div>
+				</a>
+				<?php
+			}
+
+			?>
+		</div>
+	</div>
+
+
+	<div class="row">
+
+		<div class="col-md-9 col-sm-12">
+
+			<h2><?php echo __('hostingaccount'); ?></h2>
+
+			<dl class="dl-horizontal">
+				<dt class="col-sm-4"><?php echo __('account'); ?></dt>
+				<dd class="col-sm-8"><?php echo normalize($service->Username); ?></dd>
+				<?php
+				if(isset($service->Domain) && $service->Domain)
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('domain'); ?></dt>
+					<dd class="col-sm-8"><?php echo normalize($service->Domain); ?></dd>
+					<?php
+				}
+
+				if(isset($service->PackageName) && $service->PackageName)
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('package'); ?></dt>
+					<dd class="col-sm-8"><?php echo normalize($service->PackageName); ?></dd>
+					<?php
+
+					if(isset($service->LimitInfo) && $service->LimitInfo)
+					{
+						?>
+						<dt class="col-sm-4"><?php echo __('diskspace limit'); ?></dt>
+						<dd class="col-sm-8"><?php echo normalize(formatMB($service->UsageInfo['DiscSpace'], formatMB($service->LimitInfo['DiscSpace'])) . ' / ' . formatMB($service->LimitInfo['DiscSpace'])); ?></dd>
+
+						<dt class="col-sm-4"><?php echo __('bandwidth limit'); ?></dt>
+						<dd class="col-sm-8"><?php echo normalize(formatMB($service->UsageInfo['BandWidth'], formatMB($service->LimitInfo['BandWidth'])) . ' / ' . formatMB($service->LimitInfo['BandWidth'])); ?></dd>
+						<?php
+					}
+				}
+				?>
+
+				<dt class="col-sm-4"><?php echo __('status'); ?></dt>
+				<dd class="col-sm-8"><?php echo __($service->Status, 'array_hostingstatus'); ?></dd>
+			</dl>
+		</div>
+
+	</div>
+
+	<?php
+		$this->showElement('service.subscription');
+	?>
+
+	<div class="row">
+
+		<div class="col-md-12">
+			<h2><?php echo __('domains'); ?></h2>
+
+			<div id="domain-info">
+				<span class="fas fa-spinner fa-lg fa-pulse"></span> &nbsp;
+				<?php echo __('retrieving data'); ?>
+			</div>
+
+			<div id="hosting-domains-header" class="hide">
+				<div class="row hidden-xs-down">
+					<div class="col-sm-4"><strong><?php echo __('domain'); ?></strong></div>
+					<div class="col-sm-4"><strong><?php echo __('used bandwidth'); ?></strong></div>
+					<div class="col-sm-4"><strong><?php echo __('used diskspace'); ?></strong></div>
+				</div>
+				<hr class="small">
+			</div>
+
+			<div id="hosting-domains"></div>
+		</div>
+
+	</div>
+
+	<script type="text/javascript">
+		$(function()
+		{
+			// we retrieve the domain info with ajax, because it retrieves data directly from the server which can make it very slow
+			$.post('<?php echo __SITE_URL . '/' . __('hosting', 'url') . '/' . __('getDomains', 'url') . '/' . $service->id; ?>', { }, function(data)
+			{
+				$('#domain-info').html('');
+				if(data != undefined)
+				{
+					if(data.message != undefined)
+					{
+						$('#domain-info').html(data.message)
+					}
+					else if(data.domains.length > 0)
+					{
+						$.each(data.domains, function( key, domain )
+						{
+							addDomainHTML(domain, data.domain_url);
+
+							if(domain.Children != undefined && domain.Children.length > 0)
+							{
+								$.each(domain.Children, function( key_child, domain_child )
+								{
+									addDomainHTML(domain_child, data.domain_url);
+								});
+							}
+
+						});
+
+						$('#hosting-domains, #hosting-domains-header').show();
+					}
+				}
+			}, 'json');
+		});
+
+		function addDomainHTML(domain, domain_url)
+		{
+			var domain_pointer = '';
+			if(domain.Type == 'pointer' || domain.Type == 'alias')
+			{
+				domain_pointer = '<span class="subdomainhook" title="' + normalize(domain.Type) + '">&nbsp;</span>';
+			}
+			if(domain_url != undefined && domain.Identifier != '')
+			{
+				// needs to be on 1 line for correct rendering
+				$('#hosting-domains').append('<div class="row small-margin-top"><div class="col-sm-4 hidden-sm-up"><strong><?php echo __('domain'); ?></strong></div><div class="col-sm-4">' + domain_pointer + '<a href="' + domain_url + domain.Identifier + '" class="text-truncate">' + normalize(domain.Domain) + '</a></div><div class="col-sm-4 hidden-sm-up"><strong><?php echo __('used bandwidth'); ?></strong></div><div class="col-sm-4">' + domain.BandWidth + '</div><div class="col-sm-4 hidden-sm-up"><strong><?php echo __('used diskspace'); ?></strong></div><div class="col-sm-4">' + domain.DiscSpace + '</div></div><hr class="small hidden-sm-up">');
+			}
+			else
+			{
+				// needs to be on 1 line for correct rendering
+				$('#hosting-domains').append('<div class="row small-margin-top"><div class="col-sm-4 hidden-sm-up"><strong><?php echo __('domain'); ?></strong></div><div class="col-sm-4 text-truncate">' + domain_pointer + '' + normalize(domain.Domain) + '</div><div class="col-sm-4 hidden-sm-up"><strong><?php echo __('used bandwidth'); ?></strong></div><div class="col-sm-4">' + domain.BandWidth + '</div><div class="col-sm-4 hidden-sm-up"><strong><?php echo __('used diskspace'); ?></strong></div> <div class="col-sm-4">' + domain.DiscSpace + '</div></div><hr class="small hidden-sm-up">');
+			}
+		}
+
+	</script>
+
+</div>
+</div>

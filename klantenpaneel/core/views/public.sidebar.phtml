@@ -1,0 +1,32 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-3 col-lg-4 sidebar hidden-md-down">
+	<div class="content-block p-a-2 p-b-0">
+
+		<h1 class="font-large"><?php echo __('contact'); ?></h1>
+
+		<p>
+			<?php echo normalize($company->CompanyName); ?><br>
+			<?php echo normalize($company->Address); ?> <br>
+			<?php echo normalize($company->ZipCode); ?>&nbsp;&nbsp;<?php echo normalize($company->City); ?><br>
+		</p>
+
+		<p>
+			<span class="fas fa-envelope fa-fw"></span>&nbsp;<?php echo normalize($company->EmailAddress); ?><br>
+			<?php
+			if($company->PhoneNumber)
+			{
+				?>
+				<span class="fas fa-mobile-alt fa-fw"></span>&nbsp;<?php echo normalize($company->PhoneNumber); ?><br>
+				<?php
+			}
+			?>
+		</p>
+		<br>
+
+	</div>
+</div>

@@ -1,0 +1,142 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+
+// Inline javascript, for ticket pages only
+?>
+<script type="text/javascript">
+	var MaxAttachments = <?php echo intval($max_attachments); ?>;
+	$(function()
+	{
+		// Check iframe heights/widths and clickable links
+		formatTicketIframes();
+
+		// Zoom reply in modal
+		$('span[data-event="zoom-reply"]').click(function(){
+			var IframeClone = $(this).parents('.card').html();
+
+			// Copy to DOM
+			$('#reply-zoom-content').html(IframeClone);
+
+			// Remove zoom-reply
+			$('#reply-zoom-content').find('span[data-event="zoom-reply"]').remove();
+
+			// Copy title
+			$('#reply-zoom .modal-title').html($(this).parents('div[data-div="message"]').find('div[data-div="sender"]').html());
+
+			// Remove pull-xs-right
+			$('#reply-zoom .modal-title').find('.pull-xs-right').removeClass('pull-xs-right');
+			$('#reply-zoom .modal-title').find('.pull-xs-right').removeClass('text-xs-right');
+			$('#reply-zoom .modal-title').find('br').remove();
+			$('#reply-zoom .modal-title').find('small').addClass('m-r-1 pull-xs-right');
+
+			// Determine width/height
+			setTimeOut(formatTicketIframes(),300);
+		});
+
+		// Add attachments
+		$('a[data-event="add-attachment"]').click(function(){
+
+			if($('input[name="Attachments[]"]').length == MaxAttachments)
+			{
+				// Max attachments reached
+				return false;
+			}
+
+			$(this).before('<div class="form-group"><input type="file" name="Attachments[]" value=""/> <a href="#" data-event="remove-attachment"><span class="fas fa-times"></span></a></div>');
+
+			// Hide add attachment button
+			if($('input[name="Attachments[]"]').length == MaxAttachments)
+			{
+				$('a[data-event="add-attachment"]').addClass('hide');
+			}
+
+			// Return false, to prevent href="#"
+			return false;
+		});
+
+		// Remove attachments
+		$(document).on('click', 'a[data-event="remove-attachment"]', function(event) {
+			$(this).parent().remove();
+
+			// Show add attachment button
+			if($('input[name="Attachments[]"]').length < MaxAttachments)
+			{
+				$('a[data-event="add-attachment"]').removeClass('hide');
+			}
+
+			// If we have an attachment error, remove it
+			$('#attachment-error').remove();
+			return false;
+		});
+
+		// Calculate attachment size
+		$('form').submit(function(event){
+
+			//check whether browser fully supports all File API
+			if(window.File && window.FileReader && window.FileList && window.Blob)
+			{
+				var Size = 0;
+
+				//get the file size and file type from file input field
+				$('input[name="Attachments[]"]').each(function(index, element)
+				{
+					if($(element)[0].files[0] == undefined)
+					{
+						return;
+					}
+
+					// Count file size
+					Size += $(element)[0].files[0].size;
+				});
+
+				if(Size > 10 * 1024 * 1024) // max 10mb
+				{
+					$('a[data-event="add-attachment"]').after('<div id="attachment-error" class="alert alert-danger m-t-1" role="alert"><p><?php echo __('max file size attachment'); ?></p></div>');
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+
+			return true;
+
+		});
+
+	});
+
+	function formatTicketIframes()
+	{
+		// Show tickets in iframes and determine height
+		$('.ticket_iframe iframe').each( function()
+		{
+			$(this).on('load', function()
+			{
+				$(this).parent().height($(this).contents().height());
+				$(this).height($(this).contents().height());
+				$(this).width($(this).contents().width());
+
+				// makes sure links in the iframes open in a new window, otherwise they open in the iframe
+				if($(this).contents().find('a').length > 0)
+					{
+						$(this).contents().find('a').attr('target', '_blank');
+
+						// add http:// to links
+						$(this).contents().find('a').each( function()
+							{
+								var href = $(this).attr('href');
+								if(href.substring(0, 4) != 'http' && href.substring(0, 6) != 'ftp://' && href.substring(0, 7) != 'mailto:' && href.substring(0, 7) != 'news://')
+									{
+										$(this).attr('href', '//' + $(this).attr('href'));
+										}
+								});
+						}
+				});
+		});
+
+	}
+</script>

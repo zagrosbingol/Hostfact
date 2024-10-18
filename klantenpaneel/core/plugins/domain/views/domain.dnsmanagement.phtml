@@ -1,0 +1,278 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2">
+
+	<?php
+	if (isset($message))
+	{
+		echo $message;
+		$this->unsetVar(array('message'));
+	}
+	?>
+
+	<h1><?php echo __('dns management') . ' ' . __('from') . ' ' . normalize($service->Domain . '.' . $service->Tld); ?></h1>
+
+	<?php
+	// if there is a pending modification, show a warning and a link to cancel it
+	$this->showElement('service.modification');
+	?>
+
+	<div class="row">
+
+		<div class="col-sm-12">
+			<h2 class="m-t-0"><?php echo __('dns zone records'); ?></h2>
+
+			<form id="form-dns-zone" class="m-t-2" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('domain', 'url'); ?>/<?php echo __('dnsmanagement', 'url'); ?>/<?php echo $service->id; ?>">
+
+				<?php
+					/** EDITABLE DNS RECORDS */
+					if(!empty($service->DNSZone['records']))
+					{
+						$record_types = (isset($service->DNSZone['SettingAvailableTypes']) && $service->DNSZone['SettingAvailableTypes']) ? $service->DNSZone['SettingAvailableTypes'] : array();
+
+						// WITH ROWS
+						?>
+						<div class="row small-gutter strong hidden-sm-down">
+							<div class="col-md-3"><?php echo __('dns record name'); ?></div>
+							<div class="col-md-2"><?php echo __('dns record type'); ?></div>
+							<div class="col-md-5"><?php echo __('dns record value'); ?></div>
+							<div class="col-md-2"><?php echo __('dns record ttl'); ?></div>
+						</div>
+						<hr class="small" />
+
+						<div id="dns-zone">
+						<?php
+						foreach($service->DNSZone['records'] as $index => $_dns_record)
+						{
+							?>
+							<div class="dns-record">
+							<div class="row small-gutter p-b-1">
+
+								<?php /** NAME */ ?>
+								<div class="col-md-3">
+									<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record name'); ?></strong></label>
+                                    <input type="hidden" name="DNSZone[id][<?php echo normalize($index); ?>]" value="<?php echo ($_dns_record['id']) ? normalize($_dns_record['id']) : 0; ?>">
+									<input type="hidden" name="DNSZone[checksum][<?php echo normalize($index); ?>]" value="<?php echo md5($_dns_record['name'].$_dns_record['type'].$_dns_record['value']); ?>">
+									<input class="form-control" type="text" name="DNSZone[Name][<?php echo normalize($index); ?>]" value="<?php echo normalize($_dns_record['name']); ?>">
+								</div>
+
+								<?php /** TYPE */ ?>
+								<div class="col-md-2">
+									<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record type'); ?></strong></label>
+									<select class="form-control" name="DNSZone[Type][<?php echo normalize($index); ?>]">
+										<?php
+										foreach($record_types as $record_type_value => $record_type_name)
+										{
+											?>
+											<option value="<?php echo $record_type_value; ?>" <?php echo ($record_type_value == $_dns_record['type']) ? 'selected' : ''; ?>>
+												<?php echo normalize($record_type_value); ?>
+											</option>
+											<?php
+										}
+										?>
+									</select>
+								</div>
+
+								<?php /** VALUE (& PRIORITY) */ ?>
+								<div class="col-md-5">
+									<div class="row small-gutter dns-record-value">
+										<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record value'); ?></strong></label>
+										<div class="<?php echo (in_array(strtolower($_dns_record['type']), array('mx', 'srv'))) ? 'col-md-9' : 'col-md-12'; ?>">
+											<textarea name="DNSZone[Value][<?php echo normalize($index); ?>]" class="form-control autogrow" rows="1"><?php echo normalize($_dns_record['value']); ?></textarea>
+										</div>
+
+										<div class="col-md-3 <?php echo (in_array(strtolower($_dns_record['type']), array('mx', 'srv'))) ? '' : 'hide'; ?>">
+											<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record priority'); ?></strong></label>
+											<input type="text" class="form-control" name="DNSZone[Priority][<?php echo normalize($index); ?>]" value="<?php if(isset($_dns_record['priority'])){ echo normalize($_dns_record['priority']); } ?>" />
+										</div>
+									</div>
+								</div>
+
+								<?php /** TTL */ ?>
+								<div class="col-md-2">
+									<div class="row small-gutter">
+										<div class="col-md-10">
+											<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record ttl'); ?></strong></label>
+											<input type="text" class="form-control" name="DNSZone[TTL][<?php echo normalize($index); ?>]" value="<?php echo normalize($_dns_record['ttl']); ?>" />
+										</div>
+										<div class="col-md-2 p-a-0 lineheight1">
+											<a href="#" class="delete-dns-record hidden-sm-down">
+												<span class="fas fa-times"></span>
+											</a>
+											<a href="#" class="delete-dns-record btn btn-secondary btn-sm hidden-md-up m-t-1 pull-xs-right">
+												<?php echo __('delete dns record'); ?>
+											</a>
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<hr class="hidden-md-up" />
+							</div>
+							<?php
+						}
+						?>
+						</div>
+					<?php
+					}
+				?>
+
+				<a class="btn btn-outline-primary" id="add-dns-record" href="#">
+					<?php echo __('add dns record'); ?>
+				</a>
+
+				<br />
+				<br />
+
+				<div class="form-group row">
+					<div class="col-sm-12 m-t-1">
+						<a href="<?php echo __SITE_URL; ?>/<?php echo __('domain', 'url'); ?>/<?php echo __('view', 'url'); ?>/<?php echo $service->id; ?>" class="btn btn-secondary pull-xs-left">
+							<span class="fas fa-arrow-left"></span>&nbsp;
+							<?php echo __('back'); ?>
+						</a>
+						<button type="submit" class="btn btn-primary pull-xs-right"><?php echo __('save data'); ?></button>
+					</div>
+				</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
+</div>
+</div>
+
+
+<div id="clone-dns-record-input" class="hide">
+	<div class="dns-record">
+		<div class="row small-gutter p-b-1">
+
+			<?php /** NAME */ ?>
+			<div class="col-md-3">
+				<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record name'); ?></strong></label>
+				<input class="form-control" type="text" name="DNSZone[Name][]" value="">
+			</div>
+
+			<?php /** TYPE */ ?>
+			<div class="col-md-2">
+				<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record type'); ?></strong></label>
+				<select class="form-control" name="DNSZone[Type][]">
+					<?php
+					foreach($record_types as $record_type_value => $record_type_name)
+					{
+						?>
+						<option value="<?php echo $record_type_value; ?>">
+							<?php echo normalize($record_type_value); ?>
+						</option>
+						<?php
+					}
+					?>
+				</select>
+			</div>
+
+			<?php /** VALUE (& PRIORITY) */ ?>
+			<div class="col-md-5">
+				<div class="row small-gutter dns-record-value">
+					<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record value'); ?></strong></label>
+					<div class="col-md-12">
+						<textarea name="DNSZone[Value][]" class="form-control autogrow" rows="1"></textarea>
+					</div>
+
+					<div class="col-md-3 hide">
+						<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record priority'); ?></strong></label>
+						<input type="text" class="form-control" name="DNSZone[Priority][]" value="" />
+					</div>
+				</div>
+			</div>
+
+			<?php /** TTL */ ?>
+			<div class="col-md-2">
+				<div class="row small-gutter">
+					<div class="col-md-10">
+						<label class="hidden-md-up m-t-1"><strong><?php echo __('dns record ttl'); ?></strong></label>
+						<input type="text" class="form-control" name="DNSZone[TTL][]" value="" />
+					</div>
+					<div class="col-md-2 p-a-0 lineheight1">
+						<a href="#" class="delete-dns-record hidden-sm-down">
+							<span class="fas fa-times"></span>
+						</a>
+						<a href="#" class="delete-dns-record btn btn-secondary btn-sm hidden-md-up m-t-1 pull-xs-right">
+							<?php echo __('delete dns record'); ?>
+						</a>
+
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<hr class="hidden-md-up" />
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function()
+	{
+		// priority is only supported for MX and SRV records
+		$('#dns-zone').on('change', 'select[name="DNSZone[Type][]"]', function()
+		{
+			if($(this).val() == 'MX' || $(this).val() == 'SRV')
+			{
+				$(this).parents('.dns-record').find('.dns-record-value .col-md-12').removeClass('col-md-12').addClass('col-md-9');
+				$(this).parents('.dns-record').find('.dns-record-value .col-md-3').show();
+			}
+			else
+			{
+				$(this).parents('.dns-record').find('.dns-record-value .col-md-9').removeClass('col-md-9').addClass('col-md-12');
+				$(this).parents('.dns-record').find('.dns-record-value .col-md-3').hide();
+			}
+		});
+
+		// add a new dns record
+		$('#add-dns-record').on('click', function()
+		{
+			// clone and add tr
+			var new_dns_record = $('#clone-dns-record-input').html();
+			var last_record_ttl = $('#dns-zone').find('input[name="DNSZone[TTL][]"]').last().val();
+
+			// add tr to table
+			$('#dns-zone').append(new_dns_record);
+
+			// set TTL value if single ttl
+			$('#dns-zone').find('input[name="DNSZone[TTL][]"]').last().val(last_record_ttl);
+
+			$('textarea.autogrow').autoGrow();
+		});
+
+		// remove dns record
+		$('#dns-zone').on('click', '.delete-dns-record', function()
+		{
+			// Remove record
+			$(this).parents('.dns-record').remove();
+			return false;
+		});
+
+		<?php
+		// if the integration only supports a single ttl (instead of a ttl per record), edit all ttl of a template if one is edited
+		if(isset($service->DNSZone['SettingSingleTTL']) && $service->DNSZone['SettingSingleTTL'] === TRUE)
+		{
+			?>
+			$('#dns-zone').on('keyup', 'input[name="DNSZone[TTL][]"]', function()
+			{
+				$(this).parents('#dns-zone').find('input[name="DNSZone[TTL][]"]').not(this).val($(this).val());
+			});
+			$('#dns-zone').on('change', 'input[name="DNSZone[TTL][]"]', function()
+			{
+				$(this).parents('#dns-zone').find('input[name="DNSZone[TTL][]"]').not(this).val($(this).val());
+			});
+			<?php
+		}
+		?>
+	});
+
+</script>

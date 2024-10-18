@@ -1,0 +1,22 @@
+
+.debtorinfo_sidebar {
+	position: absolute; left: 1275px; top: 96px; display:block;	
+}
+.debtorinfo_inline{
+	display:none;	
+}
+#buttonbar_show_debtor{
+	/*display:none;*/	
+}
+#interaction_divider{
+	display:none;	
+}
+
+#content { max-width:1232px; }
+#content.has_sidebar { max-width: 1000px;}
+
+/*.widget{ width:290px !important; }*/
+.tr_invoiceelement .input_date img.ui-datepicker-trigger { display:none;}
+.tr_invoiceelement .input_date input.hasDatepicker { display:block;}
+
+.show_col_nows { display:none; }

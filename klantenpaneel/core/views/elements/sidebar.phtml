@@ -1,0 +1,47 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+
+// build the sidebar html based on the widgets array
+
+if(!empty($sidebar_widgets))
+{
+	foreach($sidebar_widgets as $_sidebar_widget)
+	{
+		if(!isset($_sidebar_widget['type']))
+		{
+			continue;
+		}
+
+		// with the page parameter a widget can shown only on a specific page
+		if(isset($_sidebar_widget['page']) && !in_array($page_url, $_sidebar_widget['page']))
+		{
+			continue;
+		}
+
+		switch($_sidebar_widget['type'])
+		{
+			case 'raw':
+				echo $_sidebar_widget['content'];
+			break;
+
+			case 'submenu':
+				$this->generateSubmenu($_sidebar_widget['items']);
+			break;
+
+			case 'file':
+
+				if(isset($_sidebar_widget['plugin']))
+				{
+					$this->showElement($_sidebar_widget['file'], $_sidebar_widget['plugin']);
+				}
+				else
+				{
+					$this->showElement($_sidebar_widget['file']);
+				}
+			break;
+		}
+	}
+}

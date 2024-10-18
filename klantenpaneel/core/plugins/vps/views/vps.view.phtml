@@ -1,0 +1,115 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="col-xl-9 col-lg-8">
+<div class="main-content p-a-2">
+
+	<?php
+		if (isset($message))
+		{
+			echo $message;
+		}
+
+		$this->showElement('service.terminate');
+	?>
+
+	<h1><?php echo __('vps service') . ' ' . normalize($service->Hostname); ?></h1>
+
+	<?php
+		show_termination_warning($service);
+	?>
+
+	<div class="row m-t-1">
+
+		<div class="col-sm-12">
+
+			<?php
+			if(Settings_Model::get('CLIENTAREA_VPS_ACTIONS') == 'yes')
+			{
+				// only show buttons for active VPS with a VPS node
+				if($service->Status == 'active' && isset($service->NodeInfo['Platform']) && $service->NodeInfo['Platform'])
+				{
+					?>
+					<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('vps', 'url') . '/' . __('start', 'url') . '/' . $service->id; ?>" data-spinner="true">
+						<span class="fas fa-play fa-2x"></span>
+						<br/>
+						<div><?php echo __('vps action start'); ?></div>
+					</a>
+
+					<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('vps', 'url') . '/' . __('pause', 'url') . '/' . $service->id; ?>" data-spinner="true">
+						<span class="fas fa-pause fa-2x"></span>
+						<br/>
+						<div><?php echo __('vps action pause'); ?></div>
+					</a>
+
+					<a class="btn btn-secondary action-btn" href="<?php echo __SITE_URL . '/' . __('vps', 'url') . '/' . __('restart', 'url') . '/' . $service->id; ?>" data-spinner="true">
+						<span class="fas fa-sync fa-2x"></span>
+						<br/>
+						<div><?php echo __('vps action restart'); ?></div>
+					</a>
+					<?php
+				}
+			}
+			?>
+
+		</div>
+	</div>
+
+	<div class="row">
+
+		<div class="col-md-9 col-sm-12">
+
+			<h2><?php echo __('vps service'); ?></h2>
+
+			<dl class="dl-horizontal">
+
+				<?php
+
+				if($service->Status == 'active')
+				{
+					// Show IP address if filled
+					if($service->IPAddress)
+					{
+						?>
+						<dt class="col-sm-4"><?php echo __('ip address'); ?></dt>
+						<dd class="col-sm-8"><?php echo normalize($service->IPAddress); ?></dd>
+						<?php
+					}
+					?>
+
+					<dt class="col-sm-4"><?php echo __('memory'); ?></dt>
+					<dd class="col-sm-8"><?php echo ($service->MemoryMB) ? $service->MemoryMB . ' ' . __('megabytes short') : '-'; ?></dd>
+
+					<dt class="col-sm-4"><?php echo __('diskspace'); ?></dt>
+					<dd class="col-sm-8"><?php echo ($service->DiskSpaceGB) ? $service->DiskSpaceGB . ' ' . __('gigabytes short') : '-'; ?></dd>
+
+					<dt class="col-sm-4"><?php echo __('bandwidth'); ?></dt>
+					<dd class="col-sm-8"><?php echo ($service->BandWidthGB) ? $service->BandWidthGB . ' ' . __('gigabytes short') : '-'; ?></dd>
+
+					<dt class="col-sm-4"><?php echo __('cpu cores'); ?></dt>
+					<dd class="col-sm-8"><?php echo ($service->CPUCores) ? $service->CPUCores : '-'; ?></dd>
+					<?php
+				}
+
+				if($service->Status != 'active')
+				{
+					?>
+					<dt class="col-sm-4"><?php echo __('status'); ?></dt>
+					<dd class="col-sm-8"><?php echo __($service->Status, 'array_vpsstatus'); ?></dd>
+					<?php
+				}
+				?>
+			</dl>
+		</div>
+
+	</div>
+
+	<?php
+		$this->showElement('service.subscription');
+	?>
+
+</div>
+</div>

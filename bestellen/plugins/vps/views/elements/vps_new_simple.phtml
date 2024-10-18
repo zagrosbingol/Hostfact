@@ -1,0 +1,20 @@
+<div class="vps_new_simple">
+	<label class="w1"><?php echo __('vps product', 'vps'); ?>:</label>
+	<select name="VPS" class="w1 <?php if(SHOW_SELECT_PRICE == 'yes'){ echo "show_amount_span"; } ?>">
+		<option value=""><?php echo __('please choose'); ?></option>
+		<?php
+		foreach($list_products as $product_id => $tmp_product){
+			?><option value="<?php echo $tmp_product->ProductCode; ?>" <?php if(isset($vps['ProductCode']) && $vps['ProductCode'] == $tmp_product->ProductCode){ echo "selected=\"selected\""; } ?>><?php echo $tmp_product->ProductName; ?></option><?php
+		}
+		?>
+	</select>
+	
+	<?php
+	if(SHOW_SELECT_PRICE == 'yes')
+	{
+		foreach($list_products as $product_id => $tmp_product){
+			show_amount_span($tmp_product, 'VPS');
+		}
+	}
+	?>
+</div>

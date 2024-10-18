@@ -1,0 +1,116 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Notificatie via het klantenpaneel</title>
+<style type='text/css'>
+<!--
+body {
+    font-size:1em;
+	font-family: 'Arial', 'Verdana', sans-serif;
+    color: #000000;
+}
+p {
+	font-size:1em;
+	font-family: 'Arial', 'Verdana', sans-serif;
+	line-height: 1.8em;
+}
+a, a:visited, a:active {
+	text-decoration: underline;
+	color: #1b5cce;
+}
+
+a:hover {
+	text-decoration: none;
+	color: #1b5cce;
+}
+-->
+</style>
+</head>
+<body>
+
+<br />
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<td width="100%" align="center">
+		
+			<table border="0" cellpadding="0" cellspacing="0" width="680">
+				<tr>
+					<td width="680" align="left">
+						
+						<h2>Er is een <?php if($all != true){ ?>eenmalige <?php } ?>machtiging gegeven</h2>
+						
+						<p style="line-height: 1.8em;">
+							Op <?php echo date('d-m-Y').' om '.date('H:i'); ?> is er een <?php if($all != true){ ?>eenmalige <?php } ?>machtiging gegeven voor de openstaande factuur <a href="<?php echo BACKOFFICE_URL ?>invoices.php?page=show&id=[invoice-&gt;id]">[invoice-&gt;InvoiceCode]</a>. <?php if($all == true){ ?><br />Alle reeds openstaande facturen en toekomstige facturen mogen ook geïncasseerd worden.<?php } ?>
+						</p>
+					</td>
+				</tr>
+				<?php if(!empty($old)){ ?>
+				<tr>
+					<td width="680" align="center">
+						<br />
+						<hr />
+						<table border="0" cellpadding="5" cellspacing="0" width="100%">
+							<tr>
+								<td></td>
+								<td><strong>Huidige gegevens</strong></td>
+								<td><strong>Nieuwe gegevens</strong></td>
+							</tr>
+							<tr>
+								<td>Bankrekeningnummer</td>
+								<td><?php echo $old['AccountNumber']; ?></td>
+								<td><?php echo $new['AccountNumber']; ?></td>
+							</tr>
+							<tr>
+								<td>BIC</td>
+								<td><?php echo $old['AccountBIC']; ?></td>
+								<td><?php echo $new['AccountBIC']; ?></td>
+							</tr>
+							<tr>
+								<td>Naam rekeninghouder</td>
+								<td><?php echo $old['AccountName']; ?></td>
+								<td><?php echo $new['AccountName']; ?></td>
+							</tr>
+							<tr>
+								<td>Vestigingsplaats bank</td>
+								<td><?php echo $old['AccountCity']; ?></td>
+								<td><?php echo $new['AccountCity']; ?></td>
+							</tr>	
+						</table>
+						
+						<hr />
+					</td>
+
+				</tr>
+				<?php } ?>
+				<tr>
+					<td width="680" align="left">
+						
+						<br />
+						
+						<p>
+							<a href="<?php echo BACKOFFICE_URL ?>invoices.php?page=show&id=[invoice-&gt;id]">Ga direct naar de factuur in HostFact</a>
+						</p>
+						
+					</td>
+				</tr>
+				
+				<tr>
+					<td width="680" align="center">
+						
+						<br /><br />
+						
+						<font style="color:#666666;font-size:0.8em">Dit is een automatisch verzonden e-mail vanuit uw HostFact</font>
+					
+					</td>
+				</tr>
+			</table>
+		
+		</td>
+	</tr>
+</table>
+
+<br /><br />
+
+</body>
+</html>

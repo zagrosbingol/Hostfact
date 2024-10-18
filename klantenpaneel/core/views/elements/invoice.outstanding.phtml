@@ -1,0 +1,45 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<table class="table m-t-lg table-striped">
+		<colgroup>
+			<col class="col-sm-3 col-xs-8">
+			<col class="col-sm-7 hidden-xs-down">
+			<col class="col-sm-2 col-xs-4" span="2">
+		</colgroup>
+		<thead>
+		<tr>
+			<th><?php echo __('invoice'); ?></th>
+			<th class="hidden-xs-down"><?php echo __('invoice date'); ?></th>
+			<th colspan="2" class="text-xs-right text-nowrap"><?php echo __('to pay'); ?></th>
+		</tr>
+		</thead>
+		<tbody>
+		<?php
+		foreach($outstanding_invoices as $_invoice)
+		{
+			?>
+			<tr>
+				<td>
+					<a href="<?php echo __SITE_URL . '/' . __('invoice', 'url') . '/' . __('view', 'url') . '/' . $_invoice['Identifier']; ?>">
+						<?php echo normalize($_invoice['InvoiceCode']); ?>
+					</a>
+					<?php
+					if($_invoice['Authorisation'] == 'yes')
+					{
+						?><small class="text-muted"><?php echo __('direct debit invoice abbr'); ?></small><?php
+					}
+					?>
+				</td>
+				<td class="hidden-xs-down"><?php echo rewrite_date_db2site($_invoice['Date']); ?></td>
+				<?php echo money_td($_invoice['AmountOpen']); ?>
+			</tr>
+			<?php
+		}
+		?>
+
+		</tbody>
+	</table>

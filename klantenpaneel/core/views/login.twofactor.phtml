@@ -1,0 +1,24 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<form class="form-password-two-factor-auth m-t-1 text-xs-left" method="post" action="<?php echo __SITE_URL; ?>/<?php echo __('login', 'url'); ?>/<?php echo __('twoFactorAuth', 'url'); ?>">
+
+	<?php
+	if (isset($message))
+	{
+		echo $message;
+	}
+	?>
+
+	<h2><?php echo __('two factor login title'); ?></h2>
+
+	<p><?php echo __('two factor login description'); ?></p>
+
+	<!--[if IE 9]><label><?php echo __('authentication code'); ?></label><![endif]-->
+	<input type="text" class="form-control m-b-1" name="authCode" required="" autofocus="" autocomplete="off">
+
+	<button class="btn btn-primary btn-block m-t-1" type="submit"><?php echo __('submit'); ?></button>
+</form>

@@ -1,0 +1,70 @@
+*, html,body{color:#000000 !important; font-size:11px;}
+html,body{background:#fff; padding:0 0.5em 0 3em;}
+
+/* Statistics */
+	/* General display none */
+	#header { display:none; }
+	#menu { display:none; }
+	#sidebar { display:none; }
+	#content {padding:0; margin:0; max-width:9999999px !important; min-width:0; box-shadow: none;min-height:auto;}
+	#knowledgebase { display:none; }
+	#container{min-width:0;}
+	
+	#content div.heading1 { background: none; }
+	#content div.heading1 p.pos1 { display:none; } 
+	
+	/* Warning */
+	#content .mark.alt1{margin:10px; background:none; border:1px solid grey;}
+	#content .mark .close{display:none;}
+
+	/* No borders and tabs */
+	#content .box2{border:0;}
+	#content .box2 > .top{display:none;}
+
+	/* Seperator between categories */
+	#content .ui-tabs-hide {display:block !important;}
+	#content .ui-tabs-panel{clear:both; border:0; border-bottom:1px solid #aaa; border-radius:0; -moz-border-radius:0; -webkit-border-radius:0; padding:0; padding-bottom:5px; margin-bottom:20px;}
+	#content .ui-tabs-panel:last-child{border:0;}
+	
+	/* Heading */
+	#content .heading1 { display:none; }
+	#content .heading_print{display:block;background:#ffffff; border-bottom:1px solid #000000; margin:0; padding:5px 0px 0px 0px; border-radius:0; -moz-border-radius:0; -webkit-border-radius:0;}
+	#content .heading_print h2, #content .heading_print .textsize1{font-size:18px;}
+	#content .pos1 .arrowleft, #content .pos1 .arrowright{display:none;}
+	#content .heading_print .pos2 strong{width:300px; line-height:30px !important;}
+	#content .heading_print .pos2{position:absolute; left:55%; float:none; margin-left:-150px !important; top:38px; line-height:40px !important;}
+	#content .optionsbar{display:none;}
+	#content .heading_print .pos2 span{display:none;}
+	
+	#content .heading_print.print_only { margin-bottom:10px;}
+	
+	.icl_table td:first-child, 
+	.icl_table th:first-child,	
+	.table5 th:first-child,.table5 td:first-child {padding-left: 0px;}
+	
+	/* Style blocks */
+	#content .box3 h3{background:none; font-size:14px; padding:0;}
+	#content .box3 .content{background:none; padding:0;}
+	
+	/* Tables */
+	#content .table1 { border: 1px solid #000; border-bottom:0px; border-radius:0px;}
+	#content .table1 th{background:none; border-bottom: 1px solid #000;}
+	#content .table1 td{background:none; border-bottom: 1px solid #000;}
+	#content .c1 { color: #000 !important;}
+	#content .table1 .mark2 { display:none; }
+	
+	/* Specs */
+	#content #tab-details div.split2 { display:none;}
+	#content div.heading_print:before { display:block; margin-bottom: 10px; content: url('../images/logo.png'); }
+
+	#content .hide.print_only { display:block; }
+	
+
+	/* Hide graphs */
+	#content .split2 > .rightsmall{display:none;}
+	
+	/* Full width */
+	#content .split2 > .leftlarge{width:100%;position:static;float:none;}
+
+	/* FireFox printing issues */
+	#tabs { overflow: visible}

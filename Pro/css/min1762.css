@@ -1,0 +1,4 @@
+.debtorinfo_sidebar {
+	position: absolute; left: 1507px; top: 96px; display:block;	
+}
+#content.has_sidebar { max-width: 1232px;}

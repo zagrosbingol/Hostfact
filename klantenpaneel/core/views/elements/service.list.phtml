@@ -1,0 +1,88 @@
+<?php
+/**
+ * This is a core PHP file. For customization, create a file in the folder /custom/.
+ * Files with the same filename in this folder will automatically be loaded instead of the current file
+ */
+?>
+<div class="sidebar-column p-t-1">
+
+	<?php
+	$search = Cache::get('filter-list-group-services');
+	?>
+	<form class="m-b-2 form-list-search" role="search" action="<?php echo __SITE_URL . '/' . __('service', 'url'); ?>">
+		<input type="text" class="form-control"  placeholder="<?php echo __('search'); ?>" value="<?php if($search){ echo normalize($search); } ?>" id="list-search">
+	</form>
+
+	<?php
+	if(!empty($services))
+	{
+		?>
+		<div id="list-items">
+
+			<h3 class="m-b-1 m-t-2">
+				<a class="hidden-lg-up" data-toggle="collapse" href="#list-group-services" aria-controls="list-group-services">
+					<?php echo __('other services'); ?>
+				</a>
+				<span class="hidden-md-down"><?php echo __('other services'); ?></span>
+				<span class="tag tag-default tag-pill pull-xs-right result-count"><?php echo ($services) ? count($services) : 0; ?></span>
+			</h3>
+
+			<div class="list-group full-width collapse collapse-md-up row scrollable-list" id="list-group-services">
+				<?php
+				// Button for new service...
+				if(Settings_Model::get('CLIENTAREA_OTHER_ORDERFORM') && Settings_Model::get('CLIENTAREA_OTHER_ORDERFORM') > 0)
+				{
+					// Normal link, which will open in client area
+					?>
+					<a href="<?php echo __SITE_URL . '/' . __('service', 'url') . '/' . __('orderNew', 'url'); ?>" class="list-group-item list-group-item-action text-truncate text-xs-center hidden-md-down <?php if(get_url_string() == 'service.orderNew'){ echo ' active'; } ?>">
+						<span class="fas fa-plus"></span> <?php echo __('order new service'); ?>
+					</a>
+					<?php
+					// And a responsive link, which opens in new tab
+					?>
+					<a href="<?php echo Settings_Model::get('ORDERFORM_URL') . '?cart=' . Settings_Model::get('CLIENTAREA_OTHER_ORDERFORM'); ?>" class="list-group-item list-group-item-action text-truncate text-xs-center hidden-lg-up" target="_blank">
+						<span class="fas fa-plus"></span> <?php echo __('order new service'); ?>
+					</a>
+					<?php
+				}
+				?>
+
+				<?php
+                if(is_array($services))
+				{
+					foreach($services as $_item)
+					{
+						$active = (isset($service->id) && $_item['Identifier'] == $service->id) ? 'active' : '';
+						?>
+                        <a href="<?php echo __SITE_URL . '/' . __('service', 'url') . '/' . __('view', 'url') . '/' . $_item['Identifier']; ?>" class="list-group-item list-group-item-action <?php echo $active; ?>" data-search-term="<?php echo strtolower(normalize($_item['Subscription']['Description'])); ?>">
+
+							<?php
+							if($_item['Subscription']['TerminationDate'])
+							{
+								?>
+                                <s>
+									<?php echo normalize($_item['Subscription']['Description']); ?>
+                                </s>
+                                <br/>
+                                <div class="clearfix">
+                                    <small class="text-muted"><?php echo sprintf(__('service list termination at'), rewrite_date_db2site($_item['Subscription']['TerminationDate'])); ?></small>
+                                </div>
+								<?php
+							}
+							else
+							{
+								echo normalize($_item['Subscription']['Description']);
+							}
+							?>
+                        </a>
+						<?php
+					}
+				}
+				?>
+				<a id="list-search-noresult" class="list-group-item hide"><?php echo __('no search results found'); ?></a>
+			</div>
+		</div>
+		<?php
+	}
+	?>
+</div>
